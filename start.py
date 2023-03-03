@@ -1,6 +1,8 @@
 from logger import logger
 from process import popen
 from config import *
+import argparse
+
 
 
 def build_base_image() -> int:
@@ -67,10 +69,25 @@ def build_fuzz_target_image(fuzzer:str, target_project:str) -> int:
 
 def main():
     logger.info("start.")
+    parser = argparse.ArgumentParser(description='Open source fuzzbench')
+    parser.add_argument("-f", "--fuzzers", nargs='+', type=str, default=[], help="fuzzers list")
+    parser.add_argument("-t", "--fuzz_targets", nargs='+', type=str, default=[], help="fuzz target project names")
+    args, other_args = parser.parse_known_args()
+    if len(args.fuzzers) == 0:
+        logger.info("Please input fuzzer")
+        return 1
+    
+    if len(args.fuzz_targets) == 0:
+        logger.info("Please input fuzz target projects")
+        return 1
+    
     if (build_base_image()):
         exit(1)
 
-    build_fuzz_target_image("afl", "bloaty_fuzz_target")
+    for fuzzer in args.fuzzers:
+        for target in args.fuzz_targets:
+            print(fuzzer, target)
+            build_fuzz_target_image(fuzzer, target)
 
 
 
