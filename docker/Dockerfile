@@ -46,7 +46,7 @@ RUN apt-get update && \
     libbz2-dev \
     liblzma-dev \
     libsqlite3-dev \
-    libz-dev \
+    libz-dev 
 
 
 RUN pip config set global.index-url http://mirrors.dev.shuimuyulin.com/pypi/web/simple && \
