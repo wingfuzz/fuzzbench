@@ -1,7 +1,7 @@
 from logger import logger
 from process import popen
 from config import *
-from utils import check_base_image_exist 
+from utils import check_image_exist 
 
 def build_base_image() -> int:
     """ 构建一个基础镜像，后续镜像皆依赖于此
@@ -19,7 +19,7 @@ def build_base_image() -> int:
     return code
 
 
-def build_fuzzer_image(fuzzer:str) -> int:
+def build_fuzzer_image(fuzzer:str, rebuild:str) -> int:
     """ 构建一个 fuzzer 镜像
     Args:
         fuzzer (str): 模糊测试器的名字
@@ -28,6 +28,8 @@ def build_fuzzer_image(fuzzer:str) -> int:
     """
     logger.info(f"build fuzzer {fuzzer} image start.")
     fuzzer_image_name = os.path.join(DOCKER_IMAGE_BASE_TAG, fuzzer)
+    if check_image_exist(fuzzer_image_name, rebuild):
+        return 0
     docker_file_path =  os.path.join(ROOT_DIR_PATH, "fuzzers", fuzzer)
     docker_file = os.path.join(docker_file_path, "Dockerfile")
     code, _ = popen(f"docker build -t {fuzzer_image_name} --file {docker_file} {docker_file_path}")
@@ -38,7 +40,7 @@ def build_fuzzer_image(fuzzer:str) -> int:
     return code
 
 
-def build_fuzz_target_image(fuzzer:str, target_project:str) -> int:
+def build_fuzz_target_image(fuzzer:str, target_project:str, rebuild:str) -> int:
     """ 构建被测项目的镜像
     Args:
         fuzzer (str): 模糊测试器的名字
@@ -46,10 +48,12 @@ def build_fuzz_target_image(fuzzer:str, target_project:str) -> int:
     Returns:
         int: 成功返回0 失败返回1
     """
-    if (build_fuzzer_image(fuzzer)):
+    if (build_fuzzer_image(fuzzer, rebuild)):
         exit(1)
 
     image_name = os.path.join(DOCKER_IMAGE_BASE_TAG, f"{fuzzer}_{target_project}")
+    if check_image_exist(image_name, rebuild):
+        return 0
     logger.info(f"build fuzz target image {image_name} start.")
     docker_file_path =  os.path.join(ROOT_DIR_PATH, "benchmarks", target_project)
     docker_file = os.path.join(docker_file_path, "Dockerfile")
@@ -64,7 +68,7 @@ def build_fuzz_target_image(fuzzer:str, target_project:str) -> int:
     return code
 
 
-def build_images(fuzzers:list[str], fuzz_targets:list[str]) -> int:
+def build_images(fuzzers:list[str], fuzz_targets:list[str], rebuild:str) -> int:
     """构建所有镜像
     Args:
         fuzzers (list[str]): 模糊测试器的列表
@@ -73,13 +77,13 @@ def build_images(fuzzers:list[str], fuzz_targets:list[str]) -> int:
     Returns:
         int: 成功返回0 失败返回1
     """
-    if not check_base_image_exist():
+    if not check_image_exist(BASE_IMAGE_NAME, rebuild):
         if (build_base_image()):
             logger.error("Build base image failed.")
             exit(1)
 
     for fuzzer in fuzzers:
         for target in fuzz_targets:
-            if build_fuzz_target_image(fuzzer, target):
+            if build_fuzz_target_image(fuzzer, target, rebuild):
                 return 1
     return 0
