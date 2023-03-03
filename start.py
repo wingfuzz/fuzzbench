@@ -3,6 +3,7 @@ from config import *
 from buildImages import build_images
 import argparse
 
+
 def main():
     logger.info("start.")
     parser = argparse.ArgumentParser(description='Open source fuzzbench')
