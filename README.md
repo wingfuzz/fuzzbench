@@ -1,5 +1,6 @@
 # OpenSourceFuzzBench
-
+## 测试对象：AFL、AFL++、Libfuzzer、Honggfuzz、eclipser
+## 测试项目
 |项目|测试目标|字典|初始种子
 |-|-|-|-|
 |bloaty_fuzz_target|fuzz_target|无|94|
