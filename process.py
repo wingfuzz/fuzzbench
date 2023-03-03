@@ -1,7 +1,7 @@
 
 from subprocess import Popen, PIPE, STDOUT, SubprocessError, TimeoutExpired
 from typing import Tuple, Union, List
-from log import logger
+from logger import logger
 import os 
 import signal
 
