@@ -14,8 +14,6 @@
 
 FROM dev.shuimuyulin.com/fuzzbench/base-image
 
-ENV ALL_PROXY="http://192.168.221.1:10809"
-
 ENV FUZZER_NAME="afl"
 
 # Download and compile AFL v2.57b.
