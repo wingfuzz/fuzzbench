@@ -27,3 +27,4 @@ RUN /src/curl_fuzzer/scripts/ossfuzzdeps.sh
 
 WORKDIR /src/curl_fuzzer
 COPY build.sh /src/
+COPY benchmark.yaml /

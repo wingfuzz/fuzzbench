@@ -48,8 +48,9 @@ RUN apt-get update && \
     libbz2-dev \
     liblzma-dev \
     libsqlite3-dev \
-    libz-dev 
-
+    libz-dev \
+    zip \
+    unzip
 
 RUN pip config set global.index-url http://mirrors.dev.shuimuyulin.com/pypi/web/simple && \
     pip config set install.trusted-host mirrors.dev.shuimuyulin.com && \
@@ -66,6 +67,6 @@ RUN mkdir -p $OUT
 ENV ROOT_DIR=/src
 
 COPY fuzzbench.tar.gz /work
-
-RUN tar -zxvf /work/fuzzbench.tar.gz /work
+RUN mkdir -p /work/fuzzbench
+RUN tar -zxvf /work/fuzzbench.tar.gz -C /work/fuzzbench
 
