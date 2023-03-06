@@ -55,7 +55,6 @@ RUN pip config set global.index-url http://mirrors.dev.shuimuyulin.com/pypi/web/
     pip config set install.trusted-host mirrors.dev.shuimuyulin.com && \
     pip3 install --upgrade pip 
 
-
 ENV WORK /work
 RUN mkdir -p $WORK
 ENV SRC $WORK/src
@@ -65,4 +64,8 @@ ENV OUT /out
 RUN mkdir -p $OUT
 
 ENV ROOT_DIR=/src
+
+COPY fuzzbench.tar.gz /work
+
+RUN tar -zxvf /work/fuzzbench.tar.gz /work
 

@@ -21,4 +21,16 @@ def check_image_exist(image_name:str) -> bool:
     return False
 
 
+def compression_work_dir_code():
+    """ 打包项目代码
+    """
+    popen(f"tar -zcvf {ROOT_DIR_PATH}/docker/fuzzbench.tar.gz {ROOT_DIR_PATH}")
+
+
+def unzip_work_dir_code():
+    """ 解压缩项目代码
+    """
+    popen(f"tar -zxvf /work/fuzzbench.tar.gz /work")
+
+
 

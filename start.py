@@ -1,7 +1,7 @@
 from logger import logger
 from buildImages import build_images
 import argparse
-
+from utils import compression_work_dir_code
 
 def main():
     logger.info("start.")
@@ -20,6 +20,8 @@ def main():
         parser.print_help()
         return 1
     
+    
+    compression_work_dir_code()
     build_images(args.fuzzers, args.fuzz_targets, args.rebuild)
     
     
