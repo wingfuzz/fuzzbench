@@ -66,7 +66,7 @@ def build_fuzz_target_image(fuzzer:str, target_project:str, rebuild:str) -> int:
     fuzzer_image_name = os.path.join(DOCKER_IMAGE_BASE_TAG, fuzzer)
     code, _ = popen(f"docker build -t {image_name} --file {docker_file} \
                     --build-arg parent_image={fuzzer_image_name} \
-                    --build-arg FUZZER={fuzzer} {docker_file_path}")
+                    {docker_file_path}")
     if code == 0 :
         logger.info(f"build fuzz target image {image_name} success.")
     else:
