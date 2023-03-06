@@ -3,6 +3,7 @@ from process import popen
 from config import *
 from utils import check_image_exist 
 
+
 def build_base_image(rebuild:str) -> int:
     """ 构建一个基础镜像，后续镜像皆依赖于此
         rebuild (str): 是否重新构建镜像
@@ -82,10 +83,8 @@ def build_images(fuzzers:list[str], fuzz_targets:list[str], rebuild:str) -> int:
     Returns:
         int: 成功返回0 失败返回1
     """
-    if not check_image_exist(BASE_IMAGE_NAME, rebuild):
-        if (build_base_image()):
-            logger.error("Build base image failed.")
-            exit(1)
+    if build_base_image(rebuild):
+        return 1
 
     for fuzzer in fuzzers:
         for target in fuzz_targets:

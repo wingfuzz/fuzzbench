@@ -14,7 +14,9 @@
 #
 ################################################################################
 
-FROM gcr.io/oss-fuzz-base/base-builder
+ARG parent_image
+ARG FUZZER
+FROM $parent_image
 
 RUN apt-get update &&  \
     apt-get install -y \
