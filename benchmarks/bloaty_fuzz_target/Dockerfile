@@ -1,9 +1,9 @@
 
 ARG parent_image
-ARG FUZZER
 FROM $parent_image
 
-RUN git clone https://github.com/google/bloaty.git
+RUN git clone https://github.com/google/bloaty.git $SRC/bloaty
 
-WORKDIR bloaty
+
 COPY build.sh $SRC/
+COPY run_build.sh $SRC/

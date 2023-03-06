@@ -15,7 +15,6 @@
 ################################################################################
 
 ARG parent_image
-ARG FUZZER
 FROM $parent_image
 
 # Curl will be checked out to the commit hash specified in benchmark.yaml.

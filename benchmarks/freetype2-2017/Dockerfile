@@ -15,7 +15,6 @@
 ################################################################################
 
 ARG parent_image
-ARG FUZZER
 FROM $parent_image
 
 RUN apt-get update &&  \
