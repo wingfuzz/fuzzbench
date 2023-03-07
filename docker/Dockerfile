@@ -33,6 +33,8 @@ RUN apt-get update && \
     clang llvm libc++-dev libc++abi-dev  \
     cmake make git \
     ninja-build \
+    autoconf \
+    libtool \
     build-essential \
     rsync \
     wget \

@@ -17,13 +17,6 @@
 ARG parent_image
 FROM $parent_image
 
-RUN apt-get update &&  \
-    apt-get install -y \
-    make \
-    autoconf \
-    libtool \
-    wget
-
 RUN git clone git://git.sv.nongnu.org/freetype/freetype2.git
 RUN git clone https://github.com/unicode-org/text-rendering-tests.git TRT
 RUN wget https://github.com/libarchive/libarchive/releases/download/v3.4.3/libarchive-3.4.3.tar.xz
