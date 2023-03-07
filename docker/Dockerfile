@@ -52,7 +52,8 @@ RUN apt-get update && \
     libsqlite3-dev \
     libz-dev \
     zip \
-    unzip
+    unzip \
+    vim 
 
 RUN pip config set global.index-url http://mirrors.dev.shuimuyulin.com/pypi/web/simple && \
     pip config set install.trusted-host mirrors.dev.shuimuyulin.com && \

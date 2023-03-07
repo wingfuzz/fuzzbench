@@ -21,5 +21,7 @@ RUN git clone git://git.sv.nongnu.org/freetype/freetype2.git
 RUN git clone https://github.com/unicode-org/text-rendering-tests.git TRT
 RUN wget https://github.com/libarchive/libarchive/releases/download/v3.4.3/libarchive-3.4.3.tar.xz
 
-COPY * $SRC/
+COPY build.sh $SRC/
+COPY run_build.sh $SRC/
 COPY benchmark.yaml /
+RUN chmod +x $SRC/run_build.sh && $SRC/run_build.sh

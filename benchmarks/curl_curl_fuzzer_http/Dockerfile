@@ -25,6 +25,7 @@ RUN git -C /src/curl_fuzzer checkout -f 9a48d437484b5ad5f2a97c0cab0d8bcbb5d058de
 # Use curl-fuzzer's scripts to get latest dependencies.
 RUN /src/curl_fuzzer/scripts/ossfuzzdeps.sh
 
-WORKDIR /src/curl_fuzzer
-COPY build.sh /src/
+COPY build.sh $SRC/
+COPY run_build.sh $SRC/
 COPY benchmark.yaml /
+RUN chmod +x $SRC/run_build.sh && $SRC/run_build.sh
