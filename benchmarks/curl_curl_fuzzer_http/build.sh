@@ -16,5 +16,7 @@
 ################################################################################
 
 # Run the OSS-Fuzz script in the curl-fuzzer project.
-cd $SRC/curl_fuzzer
+export ARCHITECTURE="x84-64"
+export SANITIZER="address"
+cd /src/curl_fuzzer
 ./ossfuzz.sh
