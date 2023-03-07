@@ -54,9 +54,6 @@ def build_fuzz_target_image(fuzzer:str, target_project:str, rebuild:str) -> int:
     Returns:
         int: 成功返回0 失败返回1
     """
-    if (build_fuzzer_image(fuzzer, rebuild)):
-        exit(1)
-
     image_name = os.path.join(DOCKER_IMAGE_BASE_TAG, f"{fuzzer}_{target_project}")
     if rebuild == "OFF" and check_image_exist(image_name):
             return 0
@@ -74,20 +71,21 @@ def build_fuzz_target_image(fuzzer:str, target_project:str, rebuild:str) -> int:
     return code
 
 
-def build_images(fuzzers:list[str], fuzz_targets:list[str], rebuild:str) -> int:
+def build_images(fuzzers:list[str], fuzz_targets:list[str], rebuild:str) -> None:
     """构建所有镜像
     Args:
         fuzzers (list[str]): 模糊测试器的列表
         fuzz_targets (list[str]): 被测项目的列表
         rebuild (str): 是否重新构建镜像
     Returns:
-        int: 成功返回0 失败返回1
+        None 构建任意镜像失败时都退出程序
     """
     if build_base_image(rebuild):
         return 1
 
     for fuzzer in fuzzers:
+        if (build_fuzzer_image(fuzzer, rebuild)):
+            exit(1)
         for target in fuzz_targets:
             if build_fuzz_target_image(fuzzer, target, rebuild):
-                return 1
-    return 0
+                exit(1)
