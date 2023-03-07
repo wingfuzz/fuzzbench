@@ -14,17 +14,12 @@
 #
 ################################################################################
 
-FROM gcr.io/oss-fuzz-base/base-builder
-
-RUN apt-get update && \
-    apt-get install -y \
-    make \
-    autoconf \
-    automake \
-    libtool \
-    ragel \
-    pkg-config
+ARG parent_image
+FROM $parent_image
 
 RUN git clone https://github.com/behdad/harfbuzz.git
 
-COPY * $SRC/
+COPY build.sh $SRC/
+COPY run_build.sh $SRC/
+COPY benchmark.yaml /
+RUN chmod +x $SRC/run_build.sh && $SRC/run_build.sh

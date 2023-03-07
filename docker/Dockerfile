@@ -34,6 +34,7 @@ RUN apt-get update && \
     cmake make git \
     ninja-build \
     autoconf \
+    automake \
     libtool \
     build-essential \
     rsync \
@@ -53,7 +54,10 @@ RUN apt-get update && \
     libz-dev \
     zip \
     unzip \
-    vim 
+    vim \
+    ragel \
+    pkg-config
+    
 
 RUN pip config set global.index-url http://mirrors.dev.shuimuyulin.com/pypi/web/simple && \
     pip config set install.trusted-host mirrors.dev.shuimuyulin.com && \
