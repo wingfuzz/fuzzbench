@@ -16,10 +16,14 @@
 
 ARG parent_image
 FROM $parent_image
-
+ENV FUZZ_PROJECT=harfbuzz-1.3.2
 RUN git clone https://github.com/behdad/harfbuzz.git
 
 COPY build.sh $SRC/
 COPY run_build.sh $SRC/
 COPY benchmark.yaml /
-RUN chmod +x $SRC/run_build.sh && $SRC/run_build.sh
+COPY run_fuzz.sh /
+
+RUN chmod +x /run_fuzz.sh && chmod +x $SRC/run_build.sh && $SRC/run_build.sh
+
+CMD /run_fuzz.sh

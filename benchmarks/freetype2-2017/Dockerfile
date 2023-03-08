@@ -16,7 +16,7 @@
 
 ARG parent_image
 FROM $parent_image
-
+ENV FUZZ_PROJECT=freetype2-2017
 RUN git clone git://git.sv.nongnu.org/freetype/freetype2.git
 RUN git clone https://github.com/unicode-org/text-rendering-tests.git TRT
 RUN wget https://github.com/libarchive/libarchive/releases/download/v3.4.3/libarchive-3.4.3.tar.xz
@@ -24,4 +24,8 @@ RUN wget https://github.com/libarchive/libarchive/releases/download/v3.4.3/libar
 COPY build.sh $SRC/
 COPY run_build.sh $SRC/
 COPY benchmark.yaml /
-RUN chmod +x $SRC/run_build.sh && $SRC/run_build.sh
+COPY run_fuzz.sh /
+
+RUN chmod +x /run_fuzz.sh && chmod +x $SRC/run_build.sh && $SRC/run_build.sh
+
+CMD /run_fuzz.sh

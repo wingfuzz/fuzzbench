@@ -7,7 +7,7 @@ import signal
 
 def timeout_popen(command:str, timeout:float) -> Tuple[int, str]:
     """执行一个带有时间限制的指令"""
-    p = Popen("{} 2>&1".format(command), shell=True, preexec_fn=os.setsid)
+    p = Popen(f"{command} &", shell=True, preexec_fn=os.setsid)
     try:
         p.wait(timeout=timeout)
         return 0, '{} is completed'.format(command)
