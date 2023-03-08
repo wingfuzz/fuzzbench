@@ -36,7 +36,7 @@ def run_docker(fuzzers:list[str], fuzz_targets:list[str], rebuild:str, cpus:floa
             container_name = f"{fuzzer}_{target}"
             image_name = os.path.join(DOCKER_IMAGE_BASE_TAG, container_name)
             if check_image_exist(image_name):
-                code, out = popen(f"docker run -d --rm --name {container_name} --cpus {cpus} --memory {memory} --volume {SHARED_DIR}:{SHARED_DIR} {image_name}")
+                code, _ = popen(f"docker run -d --rm --name {container_name} --cpus {cpus} --memory {memory} --volume {SHARED_DIR}:{SHARED_DIR} {image_name}")
                 if code != 0:
                     exit(code)
                 container_list.append([container_name, str(time.time()), str(stop_timeout)])
