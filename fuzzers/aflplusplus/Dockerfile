@@ -1,6 +1,8 @@
 
 FROM dev.shuimuyulin.com/fuzzbench/base-image
 
+ENV FUZZER_NAME="aflplusplus"
+
 RUN apt-get update && \
     apt-get install -y \
         build-essential \
