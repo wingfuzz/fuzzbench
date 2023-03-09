@@ -16,7 +16,7 @@ FROM ubuntu:20.04
 
 ENV DEBIAN_FRONTEND noninteractive
 
-ENV ALL_PROXY="http://192.168.221.1:1081"
+ENV ALL_PROXY="http://192.168.221.1:10809"
 
 RUN mv /etc/apt/sources.list /etc/apt/sources.list-back && echo \
     "deb http://mirrors.dev.shuimuyulin.com/ubuntu/ focal main restricted universe multiverse\n\
