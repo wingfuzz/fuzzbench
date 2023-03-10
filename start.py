@@ -29,9 +29,10 @@ def main():
         return 1
     
     compression_work_dir_code()
+    #popen("python3 stopDocker.py")
     run_docker(args.fuzzers, args.fuzz_targets, args.rebuild, args.cpus, args.memory, args.stop_timeout)
     #logger.info("Fuzzbench run end.")
-    popen("python3 stopDocker.py")
+    
     
     
 

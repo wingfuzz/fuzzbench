@@ -1,1 +1,4 @@
 "container name","start time","timeout"
+"afl_bloaty_fuzz_target","1678434423.6512663","300"
+"afl_freetype2-2017","1678434555.0952947","300"
+"afl_harfbuzz-1.3.2","1678434659.3541503","300"

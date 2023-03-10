@@ -28,4 +28,4 @@ COPY run_fuzz.sh /
 
 RUN chmod +x /run_fuzz.sh && chmod +x $SRC/run_build.sh && $SRC/run_build.sh
 
-CMD /run_fuzz.sh
+#CMD /run_fuzz.sh
