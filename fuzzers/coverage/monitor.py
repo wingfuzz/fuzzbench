@@ -6,13 +6,12 @@ from process import popen
 from datetime import datetime
 
 
-async def write_coverage(fuzzer:str, cov:tuple[str]):
+async def write_coverage(fuzzer:str, cov):
     with open(os.path.join(SHARED_DIR, "coverage", "coverage.txt"), mode="a+", encoding="utf-8") as f:
         project = os.environ["FUZZ_PROJECT"]
         current_dt = datetime.now()
         row = f"{current_dt},{fuzzer},{project}," + ",".join(cov) + "\n"
         f.write(row) 
-
 
 async def get_coverage(fuzzer, stdout:str):
     print(stdout)

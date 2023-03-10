@@ -105,7 +105,6 @@ def build_coverage_images(fuzz_targets:list[str], rebuild:str):
     docker_file_path =  os.path.join(ROOT_DIR_PATH, "coverage")
     docker_file = os.path.join(docker_file_path, "Dockerfile")
     code, _ = popen(f"docker build -t {image_name} --file {docker_file} \
-                    --build-arg parent_image={fuzzer_image_name} \
                     {docker_file_path}")
     if code == 0 :
         logger.info(f"build fuzz target image {image_name} success.")
@@ -123,7 +122,7 @@ def build_coverage_images(fuzz_targets:list[str], rebuild:str):
         code, _ = popen(f"docker build -t {image_name} --file {docker_file} \
                         --build-arg parent_image={fuzzer_image_name} \
                         {docker_file_path}")
-        if code == 0 :
+        if code == 0:
             logger.info(f"build fuzz target image {image_name} success.")
         else:
             logger.error(f"build fuzz target image {image_name} failed.")
