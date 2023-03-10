@@ -44,4 +44,4 @@ ENV AFL_CC_COMPILER="LTO"
 ENV BUILD_MODES="lto"
 
 COPY run_monitor.sh /run_monitor.sh
-RUN chmdo +x /run_monitor.sh
+RUN chmod +x /run_monitor.sh
