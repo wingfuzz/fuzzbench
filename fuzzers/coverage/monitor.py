@@ -17,8 +17,9 @@ async def get_coverage(fuzzer, stdout:str):
     print(stdout)
     pattern = re.compile(r'[\s\S]*A coverage of (\d+) edges were achieved out of (\d+) existing \((\d+.\d+)%\) with \d+ input files')
     print(pattern.match(stdout))
-    print(pattern.match(stdout).groups())
-    await write_coverage(fuzzer, pattern.match(stdout).groups())
+    cov = pattern.match(stdout)
+    if cov != None:
+        await write_coverage(fuzzer, cov.groups())
 
 
 async def monitor_queue(fuzzer, output_path:str):
@@ -58,7 +59,6 @@ async def main():
         os.mkdir(coverage_path)
     
     fuzzers_output = os.listdir(SHARED_DIR)
-    print(fuzzers_output)
     futures = []
     for fuzzer in fuzzers_output:
         if (fuzzer == "coverage"):
