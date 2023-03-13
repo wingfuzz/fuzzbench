@@ -44,10 +44,11 @@ def run_docker(fuzzers:list[str], fuzz_targets:list[str], rebuild:str, cpus:floa
             if code != 0:
                 exit(code)
 
-    for t in fuzz_targets:
-        image_name = os.path.join(DOCKER_IMAGE_BASE_TAG, f"coverage_{t}")
-        code, _ = popen(f"docker run -d --rm --name coverage_{t} --cpus 1 --memory 1G --volume {SHARED_DIR}:{SHARED_DIR} --volume /root/opensourcefuzzbench:/work/fuzzbench {image_name} /bin/sh /run_monitor.sh")
-        if code != 0:
-            exit(code)
+    if "coverage" in fuzzers:
+        for t in fuzz_targets:
+            image_name = os.path.join(DOCKER_IMAGE_BASE_TAG, f"coverage_{t}")
+            code, _ = popen(f"docker run -d --rm --name coverage_{t} --cpus 1 --memory 1G --volume {SHARED_DIR}:{SHARED_DIR} --volume /root/opensourcefuzzbench:/work/fuzzbench {image_name} /bin/sh /run_monitor.sh")
+            if code != 0:
+                exit(code)
         
 
