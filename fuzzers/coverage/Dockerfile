@@ -43,5 +43,4 @@ ENV AFL_TESTCACHE_SIZE=2
 ENV AFL_CC_COMPILER="LTO"
 ENV BUILD_MODES="lto"
 
-COPY run_monitor.sh /run_monitor.sh
-RUN chmod +x /run_monitor.sh
+ENV AFL_MAP_SIZE="1024000"

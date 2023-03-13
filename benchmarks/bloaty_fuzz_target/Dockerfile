@@ -9,6 +9,7 @@ COPY run_build.sh $SRC/
 COPY benchmark.yaml /
 COPY run_fuzz.sh /
 
-RUN chmod +x /run_fuzz.sh && chmod +x $SRC/run_build.sh && $SRC/run_build.sh
-
+RUN chmod +x /run_fuzz.sh && chmod +x $SRC/run_build.sh && $SRC/run_build.sh 
+COPY run_monitor.sh /
+RUN chmod +x /run_monitor.sh
 #CMD /run_fuzz.sh
