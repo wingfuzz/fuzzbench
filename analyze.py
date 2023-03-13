@@ -18,7 +18,7 @@ def draw_line(datas, title, subtitle):
             xaxis_opts=opts.AxisOpts(type_="category", boundary_gap=False),
     )
     line.set_series_opts(label_opts=opts.LabelOpts(is_show=False))
-    save_path = os.path.join("/mnt/d/work/2023", f"{title}.html")
+    save_path = os.path.join("/mnt/d/work/2023", f"{title}-{subtitle}.html")
     line.render(save_path)
     print(f"{save_path} written.")
 		
@@ -28,8 +28,15 @@ def main():
     projects = set(df[2])
     for p in projects:
         pd_project = df.loc[df[2] == p]
-        pro_covs = pd_project[5].to_list()
+        pro_covs = pd_project[5].to_list()[:30]
         draw_line(pro_covs, p, "coverage")
+
+    crashe_df = pd.read_csv("/tmp/fuzzbench/coverage/crashe.txt", header=None, encoding="utf-8")
+    projects = set(crashe_df[2])
+    for p in projects:
+        pd_project = crashe_df.loc[crashe_df[2] == p]
+        pro_crashes = pd_project[3].to_list()[:30]
+        draw_line(pro_crashes, p, "crashe")
 
 
 if __name__ == "__main__":
