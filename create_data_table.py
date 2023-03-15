@@ -73,12 +73,27 @@ class Projects(Base):
         return self.__str__()
     
 
+class Containers(Base):
+    __tablename__ = 'containers'
+    id = Column(Integer, primary_key=True)
+    container_name = Column(String(128))
+    start_time = Column(DateTime)
+    time_out = Column(DateTime)
+    benchmark_id = Column(Integer, ForeignKey('benchmarks.id'))
+    benchmark = relationship("Benchmarks", back_populates="containers")
+
+    def __str__(self):
+        return f"id: {self.id}, container_name: {self.container_name}, start_time: {self.start_time}, time_out: {self.time_out}"
+
+    def __repr__(self):
+        return self.__str__()
+
+
 class Benchmarks(Base):
     __tablename__ = 'benchmarks'
     
     id = Column(Integer, primary_key=True)
-    start = Column(DateTime)
-    end = Column(DateTime)
+    containers = relationship("Containers", order_by=Containers.id, back_populates="benchmark")
     projects = relationship("Projects", order_by=Projects.id, back_populates="benchmark")
     
     def __str__(self):
