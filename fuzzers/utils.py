@@ -35,11 +35,11 @@ SANITIZER_FLAGS = [
     '-fsanitize=address',
     # Matches UBSan features enabled in OSS-Fuzz. See
     # https://github.com/google/oss-fuzz/blob/master/infra/base-images/base-builder/Dockerfile#L94
-    '-fsanitize=array-bounds,bool,builtin,enum,float-divide-by-zero,function,'
+    '-fsanitize=bool,builtin,enum,float-divide-by-zero,'
     'integer-divide-by-zero,null,object-size,return,returns-nonnull-attribute,'
     'shift,signed-integer-overflow,unreachable,vla-bound,vptr',
-    '-fno-sanitize-recover=array-bounds,bool,builtin,enum,float-divide-by-zero,'
-    'function,integer-divide-by-zero,null,object-size,return,'
+    '-fno-sanitize-recover=bool,builtin,enum,float-divide-by-zero,'
+    'integer-divide-by-zero,null,object-size,return,'
     'returns-nonnull-attribute,shift,signed-integer-overflow,unreachable,'
     'vla-bound,vptr',
 ]
@@ -77,7 +77,7 @@ def build_benchmark(env=None):
 
     benchmark = os.getenv('BENCHMARK')
     fuzzer = os.getenv('FUZZER')
-    print(f'Building benchmark {benchmark} with fuzzer {fuzzer}')
+    print(f'Building benchmark {benchmark} with fuzzer {fuzzer} env {env}')
     subprocess.check_call(['/bin/bash', '-ex', build_script], env=env)
 
 

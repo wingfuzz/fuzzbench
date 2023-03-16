@@ -174,7 +174,7 @@ def build(*args):  # pylint: disable=too-many-branches,too-many-statements
         # Restore SRC to its initial state so we can build again without any
         # trouble. For some OSS-Fuzz projects, build_benchmark cannot be run
         # twice in the same directory without this.
-        utils.build_benchmark()
+        utils.build_benchmark(os.environ.copy())
 
     if 'cmplog' in build_modes and 'qemu' not in build_modes:
 
