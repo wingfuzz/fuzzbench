@@ -15,7 +15,7 @@ def build_base_image(rebuild:str) -> int:
     docker_file = os.path.join(docker_file_path, "Dockerfile")
     if rebuild == "OFF" and check_image_exist(BASE_IMAGE_NAME):
         return 0
-    code, _ = popen(f"docker build --file {docker_file} --tag {BASE_IMAGE_NAME} {docker_file_path} &")
+    code, _ = popen(f"docker build --file {docker_file} --tag {BASE_IMAGE_NAME} {docker_file_path}")
     if code == 0 :
         logger.info("build base image success.")
     else:
@@ -37,7 +37,7 @@ def build_fuzzer_image(fuzzer:str, rebuild:str) -> int:
             return 0
     docker_file_path =  os.path.join(ROOT_DIR_PATH, "fuzzers", fuzzer)
     docker_file = os.path.join(docker_file_path, "Dockerfile")
-    code, _ = popen(f"docker build -t {fuzzer_image_name} --file {docker_file} {docker_file_path} &")
+    code, _ = popen(f"docker build -t {fuzzer_image_name} --file {docker_file} {docker_file_path}")
     if code == 0 :
         logger.info(f"build fuzzer {fuzzer} image success.")
     else:
@@ -63,7 +63,7 @@ def build_fuzz_target_image(fuzzer:str, target_project:str, rebuild:str) -> int:
     fuzzer_image_name = os.path.join(DOCKER_IMAGE_BASE_TAG, fuzzer)
     code, _ = popen(f"docker build -t {image_name} --file {docker_file} \
                     --build-arg parent_image={fuzzer_image_name} \
-                    {docker_file_path} &")
+                    {docker_file_path}")
     if code == 0 :
         logger.info(f"build fuzz target image {image_name} success.")
     else:
@@ -105,7 +105,7 @@ def build_coverage_images(fuzz_targets:list[str], rebuild:str):
     docker_file_path =  os.path.join(ROOT_DIR_PATH, "coverage")
     docker_file = os.path.join(docker_file_path, "Dockerfile")
     code, _ = popen(f"docker build -t {image_name} --file {docker_file} \
-                    {docker_file_path} &")
+                    {docker_file_path}")
     if code == 0 :
         logger.info(f"build fuzz target image {image_name} success.")
     else:
@@ -121,7 +121,7 @@ def build_coverage_images(fuzz_targets:list[str], rebuild:str):
         fuzzer_image_name = os.path.join(DOCKER_IMAGE_BASE_TAG, "coverage")
         code, _ = popen(f"docker build -t {image_name} --file {docker_file} \
                         --build-arg parent_image={fuzzer_image_name} \
-                        {docker_file_path} &")
+                        {docker_file_path}")
         if code == 0:
             logger.info(f"build fuzz target image {image_name} success.")
         else:
