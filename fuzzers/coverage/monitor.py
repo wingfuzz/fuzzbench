@@ -5,8 +5,17 @@ import re
 from process import popen
 from datetime import datetime
 
+async def exist_output_path():
+    """ 检查输出文件夹是否存在
+    """
+    output_path = os.path.join(SHARED_DIR, "coverage", os.environ["FUZZ_PROJECT"])
+    if not os.path.exists(output_path):
+        os.mkdir(output_path)
+
+
 
 async def write_coverage(fuzzer:str, cov):
+    await exist_output_path()
     with open(os.path.join(SHARED_DIR, "coverage", os.environ["FUZZ_PROJECT"], "coverage.txt"), mode="a+", encoding="utf-8") as f:
         project = os.environ["FUZZ_PROJECT"]
         current_dt = datetime.now()
@@ -34,6 +43,7 @@ async def monitor_queue(fuzzer, output_path:str, fuzz_target:str):
 
 
 async def write_crashe(fuzzer:str, crashe_number:int):
+    await exist_output_path()
     with open(os.path.join(SHARED_DIR, "coverage", os.environ["FUZZ_PROJECT"], "crashe.txt"), mode="a+", encoding="utf-8") as f:
         project = os.environ["FUZZ_PROJECT"]
         current_dt = datetime.now()
