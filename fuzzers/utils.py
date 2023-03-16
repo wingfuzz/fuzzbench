@@ -35,13 +35,7 @@ SANITIZER_FLAGS = [
     '-fsanitize=address',
     # Matches UBSan features enabled in OSS-Fuzz. See
     # https://github.com/google/oss-fuzz/blob/master/infra/base-images/base-builder/Dockerfile#L94
-    '-fsanitize=bool,builtin,enum,float-divide-by-zero,'
-    'integer-divide-by-zero,null,object-size,return,returns-nonnull-attribute,'
-    'shift,signed-integer-overflow,unreachable,vla-bound,vptr',
-    '-fno-sanitize-recover=bool,builtin,enum,float-divide-by-zero,'
-    'integer-divide-by-zero,null,object-size,return,'
-    'returns-nonnull-attribute,shift,signed-integer-overflow,unreachable,'
-    'vla-bound,vptr',
+    '-fsanitize=undefined',
 ]
 
 # Use these flags when compiling benchmark code without a sanitizer (e.g. when
