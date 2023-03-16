@@ -7,7 +7,7 @@ from datetime import datetime
 
 
 async def write_coverage(fuzzer:str, cov):
-    with open(os.path.join(SHARED_DIR, "coverage", "coverage.txt"), mode="a+", encoding="utf-8") as f:
+    with open(os.path.join(SHARED_DIR, "coverage", os.environ["FUZZ_PROJECT"], "coverage.txt"), mode="a+", encoding="utf-8") as f:
         project = os.environ["FUZZ_PROJECT"]
         current_dt = datetime.now()
         row = f"{current_dt},{fuzzer},{project}," + ",".join(cov) + "\n"
@@ -34,20 +34,55 @@ async def monitor_queue(fuzzer, output_path:str, fuzz_target:str):
 
 
 async def write_crashe(fuzzer:str, crashe_number:int):
-    with open(os.path.join(SHARED_DIR, "coverage", "crashe.txt"), mode="a+", encoding="utf-8") as f:
+    with open(os.path.join(SHARED_DIR, "coverage", os.environ["FUZZ_PROJECT"], "crashe.txt"), mode="a+", encoding="utf-8") as f:
         project = os.environ["FUZZ_PROJECT"]
         current_dt = datetime.now()
         row = f"{current_dt},{fuzzer},{project}," + str(crashe_number) + "\n"
         f.write(row) 
 
 
-async def monitor_crashes(fuzzer, output_path:str):
+async def get_crashe(output_ls:str):
+    """ bug去重
+
+    Args:
+        output_ls (str): 所有的case输出
+
+    Returns:
+        int : 去重后的数量
+    """
+    pattern = re.compile(r"([\s\S]+)\+0x([0-9a-fA-F]+)")
+    problems = set()
+    for i in output_ls:
+        lines = i.split("\n")
+        stacks = []
+        for line in lines:
+            bo = pattern.match(line)
+            if bo != None:
+                binary, offset = bo.groups()
+                stacks.append([binary, offset])
+        if len(stacks) != 0:
+            problems.add(tuple(stacks))
+
+    return len(problems)
+            
+
+async def monitor_crashes(fuzzer, fuzz_target, output_path:str):
     """ 监控crashe目录
     Args:
         output_path (str): 需要监控的目录
     """
     ls = os.listdir(output_path)
-    await write_crashe(fuzzer, len(ls))
+    output_ls = []
+    for i in ls:
+        case_path = os.path.join(output_path, i)
+        code, out = popen(f"{fuzz_target} {case_path}")
+        if code == 0:
+            if len(out) != 0 and "Execution successful." not in out:
+                output_ls.append(out)
+        
+    problem_number = await get_crashe(fuzzer, out)
+
+    await write_crashe(fuzzer, problem_number)
 
 
 async def run(crashes_output_path:str, coverage_output_path:str, fuzz_target:str):
@@ -65,7 +100,7 @@ async def run(crashes_output_path:str, coverage_output_path:str, fuzz_target:str
 
         monitor_crashe_dir = os.path.join(SHARED_DIR, fuzzer, os.environ["FUZZ_PROJECT"], crashes_output_path)
         if os.path.exists(monitor_crashe_dir):
-            futures.append(monitor_crashes(fuzzer, monitor_crashe_dir))
+            futures.append(monitor_crashes(fuzzer, fuzz_target, monitor_crashe_dir))
         
     await asyncio.gather(*futures)
 
