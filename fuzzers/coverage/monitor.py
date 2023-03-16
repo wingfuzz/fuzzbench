@@ -87,7 +87,7 @@ async def monitor_crashes(fuzzer, fuzz_target, output_path:str):
         case_path = os.path.join(output_path, i)
         code, out = popen(f"{fuzz_target} {case_path}")
         if code == 0:
-            if len(out) != 0 and "Execution successful." not in out:
+            if len(out) != 0:
                 output_ls.append(out)
         
     problem_number = await get_crashe(fuzzer, out)
