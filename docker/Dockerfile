@@ -17,7 +17,7 @@ FROM ubuntu:20.04
 ENV DEBIAN_FRONTEND noninteractive
 
 ENV ASAN_OPTIONS="abort_on_error=1:symbolize=0:handle_abort=1:handle_sigill=1"
-ENV UBSAN_OPTIONS = "abort_on_error=1:halt_on_error=1:print_stacktrace=1:report_error_type=1:symbolize=0"
+ENV UBSAN_OPTIONS="abort_on_error=1:print_stacktrace=1:report_error_type=1:symbolize=0"
 
 ENV ALL_PROXY="http://192.168.221.1:10809"
 
