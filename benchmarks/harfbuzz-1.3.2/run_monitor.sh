@@ -1,9 +1,9 @@
 #!/bin/sh
-# while :
-# do
-#     sleep 60
-#     PYTHONPATH=$WORK/fuzzbench python3 -u -c "import asyncio; from fuzzers.coverage import monitor; asyncio.run(monitor.run('/out/fuzz_target'))" &
-# done
+while :
+do
+    sleep 60
+    PYTHONPATH=$WORK/fuzzbench python3 -u -c "import asyncio; from fuzzers.coverage import monitor; asyncio.run(monitor.run('/out/fuzz_target'))" &
+done
 
 
-watch --interval 60 --precise --color PYTHONPATH=$WORK/fuzzbench python3 -u -c "import asyncio; from fuzzers.coverage import monitor; try: asyncio.run(monitor.run('/out/fuzz_target')) except Exception as e: print('\033[91m{}\033[0m'.format(e))"
+#watch --interval 60 --precise --color PYTHONPATH=$WORK/fuzzbench python3 -u -c "import asyncio; from fuzzers.coverage import monitor; try: asyncio.run(monitor.run('/out/fuzz_target')) except Exception as e: print('\033[91m{}\033[0m'.format(e))"
