@@ -25,7 +25,6 @@ async def exist_output_path():
         os.mkdir(output_path)
 
 
-
 async def write_coverage(fuzzer:str, cov):
     await exist_output_path()
     with open(os.path.join(SHARED_DIR, "coverage", os.environ["FUZZ_PROJECT"], "coverage.txt"), mode="a+", encoding="utf-8") as f:
@@ -126,7 +125,6 @@ async def run(fuzz_target:str):
             futures.append(monitor_crashes(fuzzer, fuzz_target, monitor_crashe_dir))
         
     await asyncio.gather(*futures)
-
 
 
 if __name__ == "__main__":
