@@ -16,3 +16,4 @@ commit:
 commit_date: 2020-06-24 15:40:08+00:00
 fuzz_target: ossfuzz
 project: sqlite3
+type: bug
