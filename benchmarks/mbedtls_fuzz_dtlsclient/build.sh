@@ -16,11 +16,14 @@
 ################################################################################
 
 # build project
+cd  /mbedtls
+pip3 install -r /mbedtls/scripts/basic.requirements.txt
+
+# build project
 perl scripts/config.pl set MBEDTLS_PLATFORM_TIME_ALT
-git -C crypto checkout -f 819799cfc68e4c4381673a8a27af19802c8263f2
-mkdir build
+mkdir -p build
 cd build
-cmake ..
+cmake -DENABLE_TESTING=OFF ..
 # build including fuzzers
 make -j$(nproc) all
 cp programs/fuzz/fuzz_* $OUT/
@@ -45,3 +48,6 @@ cd fuzz
 # export other associated stuff
 cp *.options $OUT/
 cp fuzz_*_seed_corpus.zip $OUT/
+rm -rf /out/seeds
+mkdir /out/seeds
+unzip /out/fuzz_dtlsclient_seed_corpus.zip -d /out/seeds

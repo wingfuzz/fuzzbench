@@ -17,14 +17,14 @@
 ARG parent_image
 FROM $parent_image
 
-ENV FUZZ_PROJECT=curl_curl_fuzzer_http
+ENV FUZZ_PROJECT=mbedtls_fuzz_dtlsclient
 
 RUN apt-get update && apt-get install -y make cmake
-RUN git clone --recursive --depth 1 https://github.com/ARMmbed/mbedtls.git mbedtls
+
+RUN git clone --recursive -b development https://github.com/Mbed-TLS/mbedtls.git mbedtls
+
 RUN git clone --depth 1 https://github.com/google/boringssl.git boringssl
 RUN git clone --depth 1 https://github.com/openssl/openssl.git openssl
-RUN git clone https://github.com/ARMmbed/mbed-crypto mbedtls/crypto
-WORKDIR mbedtls
 
 COPY build.sh $SRC/
 COPY run_build.sh $SRC/
