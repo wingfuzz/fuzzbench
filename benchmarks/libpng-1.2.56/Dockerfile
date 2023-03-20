@@ -17,7 +17,7 @@
 ARG parent_image
 FROM $parent_image
 
-ENV FUZZ_PROJECT=curl_curl_fuzzer_http
+ENV FUZZ_PROJECT=libpng-1.2.56
 
 RUN apt-get update && \
     apt-get install -y \
@@ -34,8 +34,8 @@ RUN wget \
 RUN wget -qO $OUT/fuzz-target.dict \
     https://raw.githubusercontent.com/google/fuzzing/master/dictionaries/png.dict
 ADD seeds /opt/seeds
-COPY * $SRC/
-
+COPY target.cc $SRC/
+COPY png_mutator.h $SRC/
 
 COPY build.sh $SRC/
 COPY run_build.sh $SRC/
