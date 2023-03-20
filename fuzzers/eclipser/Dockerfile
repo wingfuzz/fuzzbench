@@ -12,12 +12,48 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-ARG parent_image
-FROM $parent_image
+FROM dev.shuimuyulin.com/fuzzbench/base-image
+
+ENV FUZZER_NAME="eclipser"
 
 # Upgrade to avoid certs errors
 RUN apt-get update && apt-get upgrade -y && \
     apt-get install -y apt-utils apt-transport-https ca-certificates
+
+
+# Install dotnet, qemu and other Eclipser deps.
+RUN sed -i -- 's/# deb-src/deb-src/g' /etc/apt/sources.list
+RUN apt-get update -y && \
+    apt-get build-dep -y qemu && \
+    apt-get install -y \
+        apt-transport-https \
+        libtool \
+        libtool-bin \
+        wget \
+        automake \
+        autoconf \
+        bison \
+        git \
+        gdb \
+        python2
+
+# Use a copy of
+# https://packages.microsoft.com/config/ubuntu/16.04/packages-microsoft-prod.deb
+# to avoid network flakiness.
+RUN wget -q https://storage.googleapis.com/fuzzbench-files/packages-microsoft-prod.deb -O packages-microsoft-prod.deb && \
+    dpkg -i packages-microsoft-prod.deb && \
+    apt-get update -y && \
+    apt-get install -y dotnet-sdk-2.1 dotnet-runtime-2.1 && \
+    rm packages-microsoft-prod.deb
+
+# Build Eclipser.
+RUN git clone https://github.com/SoftSec-KAIST/Eclipser.git /Eclipser && \
+    cd /Eclipser && \
+    git checkout ba1d7a55c168f7c19ecceb788a81ea07c2625e45 && \
+    ln -sf /usr/bin/python2.7 /usr/local/bin/python && \
+    make -j && \
+    ln -sf /usr/local/bin/python3.10 /usr/local/bin/python
+    
 
 # Download and compile AFL v2.56b, since Eclipser now adopts AFL as its random
 # fuzzing module. Set AFL_NO_X86 to skip flaky tests.

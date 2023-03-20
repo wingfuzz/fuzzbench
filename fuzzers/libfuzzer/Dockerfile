@@ -12,4 +12,17 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-FROM gcr.io/fuzzbench/base-image
+FROM dev.shuimuyulin.com/fuzzbench/base-image
+
+ENV FUZZER_NAME="libfuzzer"
+
+ENV LF_PATH /tmp/libfuzzer.zip
+
+# libFuzzer from branch llvmorg-15.0.3 with minor changes to build script.
+RUN wget https://storage.googleapis.com/fuzzbench-artifacts/libfuzzer.zip -O $LF_PATH && \
+    echo "ed761c02a98a16adf6bb9966bf9a3ffd6794367a29dd29d4944a5aae5dba3c90 $LF_PATH" | sha256sum --check --status && \
+    mkdir /tmp/libfuzzer && \
+    cd /tmp/libfuzzer && \
+    unzip $LF_PATH  && \
+    bash build.sh && \
+    cp libFuzzer.a /usr/lib
