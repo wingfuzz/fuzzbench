@@ -46,3 +46,6 @@ export CPPFLAGS="                                     \
 make V=1 -j $(nproc)
 
 cp tests/fuzz/ip6-send-fuzzer $OUT/fuzz-target
+cd /out 
+mkdir -p seeds
+echo 1 > seeds/1
