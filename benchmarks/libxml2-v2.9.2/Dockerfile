@@ -17,7 +17,7 @@
 ARG parent_image
 FROM $parent_image
 
-ENV FUZZ_PROJECT=curl_curl_fuzzer_http
+ENV FUZZ_PROJECT=libxml2-v2.9.2
 
 RUN apt-get update && \
     apt-get install -y \
