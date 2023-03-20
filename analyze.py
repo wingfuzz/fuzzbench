@@ -4,7 +4,7 @@ from pyecharts.charts import Line
 import os 
 from config import SHARED_DIR
 
-half_period = 360
+half_period = 360  #半衰期
 point = 30
 
 def weighted(values):
@@ -83,9 +83,7 @@ def read_coverage(cov_path):
 def read_crashe(crashe_path):
     df = pd.read_csv(crashe_path, header=None, encoding="utf-8")
     new_df = pd.DataFrame({"fuzzer": df[1], "crashes": df[3]}, columns=["fuzzer", "crashes"])
-    print(new_df.shape)
-    new_df = new_df[:30]
-    print(new_df.shape)
+    new_df = new_df[:point]
     new_dict = dict()
     for k in list(set(new_df["fuzzer"])):
         data = new_df.loc[new_df["fuzzer"] == k]
