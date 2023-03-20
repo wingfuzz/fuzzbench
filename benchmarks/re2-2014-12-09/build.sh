@@ -19,3 +19,6 @@ make -j $(nproc)
 
 $CXX $CXXFLAGS $SRC/target.cc -I . obj/libre2.a -lpthread $FUZZER_LIB \
     -o $OUT/fuzz-target
+
+mkdir -p /out/seeds
+cp /out/fuzz-target.dict /out/seeds
