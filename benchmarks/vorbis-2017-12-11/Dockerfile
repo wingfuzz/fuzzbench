@@ -14,7 +14,10 @@
 #
 ################################################################################
 
-FROM gcr.io/oss-fuzz-base/base-builder
+ARG parent_image
+FROM $parent_image
+
+ENV FUZZ_PROJECT=curl_curl_fuzzer_http
 
 RUN apt-get update && \
     apt-get install -y \
@@ -31,3 +34,11 @@ RUN wget -qO $SRC/decode_fuzzer.cc \
 
 COPY build.sh $SRC/
 ADD seeds /opt/seeds
+
+COPY run_build.sh $SRC/
+COPY benchmark.yaml /
+COPY run_fuzz.sh /
+
+RUN chmod +x /run_fuzz.sh && chmod +x $SRC/run_build.sh && $SRC/run_build.sh 
+COPY run_monitor.sh /
+RUN chmod +x /run_monitor.sh

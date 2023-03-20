@@ -26,3 +26,10 @@ RUN apt-get update && \
 RUN git clone https://github.com/openthread/openthread.git
 
 COPY build.sh $SRC/
+COPY run_build.sh $SRC/
+COPY benchmark.yaml /
+COPY run_fuzz.sh /
+
+RUN chmod +x /run_fuzz.sh && chmod +x $SRC/run_build.sh && $SRC/run_build.sh 
+COPY run_monitor.sh /
+RUN chmod +x /run_monitor.sh

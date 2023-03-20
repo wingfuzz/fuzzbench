@@ -14,8 +14,20 @@
 #
 ################################################################################
 
-FROM gcr.io/oss-fuzz-base/base-builder@sha256:02b6f53c6220b84cfb671dfc65bb8f1e224e8a5c56940e358f0fbcbd74b44734
+ARG parent_image
+FROM $parent_image
+
+ENV FUZZ_PROJECT=curl_curl_fuzzer_http
+
 RUN apt-get update && apt-get install -y make
 RUN git clone --depth 1 https://github.com/openssl/openssl.git
 WORKDIR openssl
 COPY build.sh $SRC/
+
+COPY run_build.sh $SRC/
+COPY benchmark.yaml /
+COPY run_fuzz.sh /
+
+RUN chmod +x /run_fuzz.sh && chmod +x $SRC/run_build.sh && $SRC/run_build.sh 
+COPY run_monitor.sh /
+RUN chmod +x /run_monitor.sh

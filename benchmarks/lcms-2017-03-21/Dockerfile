@@ -14,7 +14,9 @@
 #
 ################################################################################
 
-FROM gcr.io/oss-fuzz-base/base-builder
+ARG parent_image
+FROM $parent_image
+ENV FUZZ_PROJECT=lcms-2017-03-21
 
 RUN apt-get update && \
     apt-get install -y \
@@ -29,3 +31,13 @@ RUN wget -qO $OUT/fuzz-target.dict \
     https://raw.githubusercontent.com/google/fuzzing/master/dictionaries/icc.dict
 COPY cms_transform_fuzzer.cc build.sh $SRC/
 ADD seeds /opt/seeds
+
+
+COPY build.sh $SRC/
+COPY run_build.sh $SRC/
+COPY benchmark.yaml /
+COPY run_fuzz.sh /
+
+RUN chmod +x /run_fuzz.sh && chmod +x $SRC/run_build.sh && $SRC/run_build.sh 
+COPY run_monitor.sh /
+RUN chmod +x /run_monitor.sh

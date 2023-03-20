@@ -14,7 +14,11 @@
 #
 ################################################################################
 
-FROM gcr.io/oss-fuzz-base/base-builder@sha256:c18f9615c9824b61ce982e0bac4b157b2eff5b9240cc6310a4815a826bb804e3
+ARG parent_image
+FROM $parent_image
+
+ENV FUZZ_PROJECT=curl_curl_fuzzer_http
+
 RUN apt-get update && apt-get install -y make cmake flex bison
 RUN git clone --depth 1 https://github.com/the-tcpdump-group/libpcap.git libpcap
 # for corpus as wireshark
@@ -22,4 +26,14 @@ RUN git clone --depth=1 https://github.com/the-tcpdump-group/tcpdump.git tcpdump
 WORKDIR $SRC
 COPY build.sh $SRC/
 COPY patch.diff $SRC/
+
+
+COPY build.sh $SRC/
+COPY run_build.sh $SRC/
+COPY benchmark.yaml /
+COPY run_fuzz.sh /
+
+RUN chmod +x /run_fuzz.sh && chmod +x $SRC/run_build.sh && $SRC/run_build.sh 
+COPY run_monitor.sh /
+RUN chmod +x /run_monitor.sh
 

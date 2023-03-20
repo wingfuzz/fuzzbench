@@ -14,8 +14,20 @@
 #
 ################################################################################
 
-FROM gcr.io/oss-fuzz-base/base-builder@sha256:84df55d087d82b65e3a594c01248d59f49d513d4d7362014b417e640317b11f4
+ARG parent_image
+FROM $parent_image
+
+ENV FUZZ_PROJECT=curl_curl_fuzzer_http
+
 RUN apt-get update && apt-get install -y make autoconf automake libtool
 RUN git clone --depth 1 -b develop https://github.com/madler/zlib.git
 WORKDIR zlib
 COPY build.sh zlib_uncompress_fuzzer.cc $SRC/
+
+COPY run_build.sh $SRC/
+COPY benchmark.yaml /
+COPY run_fuzz.sh /
+
+RUN chmod +x /run_fuzz.sh && chmod +x $SRC/run_build.sh && $SRC/run_build.sh 
+COPY run_monitor.sh /
+RUN chmod +x /run_monitor.sh

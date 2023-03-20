@@ -14,15 +14,10 @@
 #
 ################################################################################
 
-FROM gcr.io/oss-fuzz-base/base-builder@sha256:fee307a212b2f77f208b209e2335e4a5e640f55dbe6dbe76a3e50475f9160eca
+ARG parent_image
+FROM $parent_image
 
-RUN mv /etc/apt/sources.list /etc/apt/sources.list-back && echo \
-    "deb http://dev.mirrors.shuimuyulin.com/ubuntu/ xenial main restricted universe multiverse\n\
-    deb http://dev.mirrors.shuimuyulin.com/ubuntu/ xenial-security main restricted universe multiverse\n\
-    deb http://dev.mirrors.shuimuyulin.com/ubuntu/ xenial-updates main restricted universe multiverse\n\
-    deb http://dev.mirrors.shuimuyulin.com/ubuntu/ xenial-proposed main restricted universe multiverse\n\
-    #deb http://dev.mirrors.shuimuyulin.com/ubuntu/ xenial-backports main restricted universe multiverse\n\
-    " > /etc/apt/sources.list
+ENV FUZZ_PROJECT=curl_curl_fuzzer_http
 
 RUN apt-get update && \
     apt-get install -y \
@@ -36,10 +31,19 @@ RUN apt-get update && \
     zlib1g-dev \
     liblzma-dev
 
-ENV ALL_PROXY="http://192.168.221.1:10809"
 
 RUN git clone https://gitlab.gnome.org/GNOME/libxml2.git
 
 RUN wget -qO $OUT/fuzz-target.dict \
     https://raw.githubusercontent.com/google/AFL/debe27037b9444bbf090a0ffbd5d24889bb887ae/dictionaries/xml.dict
 COPY target.cc build.sh $SRC/
+
+
+COPY build.sh $SRC/
+COPY run_build.sh $SRC/
+COPY benchmark.yaml /
+COPY run_fuzz.sh /
+
+RUN chmod +x /run_fuzz.sh && chmod +x $SRC/run_build.sh && $SRC/run_build.sh 
+COPY run_monitor.sh /
+RUN chmod +x /run_monitor.sh

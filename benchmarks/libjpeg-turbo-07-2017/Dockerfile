@@ -14,7 +14,9 @@
 #
 ################################################################################
 
-FROM gcr.io/oss-fuzz-base/base-builder
+ARG parent_image
+FROM $parent_image
+ENV FUZZ_PROJECT=libjpeg-turbo-07-2017
 
 RUN apt-get update && \
     apt-get install -y \
@@ -27,3 +29,12 @@ RUN git clone https://github.com/libjpeg-turbo/libjpeg-turbo.git
 
 ADD seeds /opt/seeds
 COPY * $SRC/
+
+COPY build.sh $SRC/
+COPY run_build.sh $SRC/
+COPY benchmark.yaml /
+COPY run_fuzz.sh /
+
+RUN chmod +x /run_fuzz.sh && chmod +x $SRC/run_build.sh && $SRC/run_build.sh 
+COPY run_monitor.sh /
+RUN chmod +x /run_monitor.sh

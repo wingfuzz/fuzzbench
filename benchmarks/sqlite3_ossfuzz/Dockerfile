@@ -14,7 +14,11 @@
 #
 ################################################################################
 
-FROM gcr.io/oss-fuzz-base/base-builder@sha256:32d87afee8e52e1550905b43d5e8583b33f37c2600446b6b9efeb14bfc25c71f
+ARG parent_image
+FROM $parent_image
+
+ENV FUZZ_PROJECT=curl_curl_fuzzer_http
+
 RUN apt-get update && apt-get install -y make autoconf automake libtool curl tcl zlib1g-dev
 
 RUN mkdir $SRC/sqlite3 && \
@@ -26,3 +30,11 @@ RUN find $SRC/sqlite3 -name "*.test" | xargs zip $SRC/ossfuzz_seed_corpus.zip
 
 WORKDIR sqlite3
 COPY build.sh *.dict $SRC/
+
+COPY run_build.sh $SRC/
+COPY benchmark.yaml /
+COPY run_fuzz.sh /
+
+RUN chmod +x /run_fuzz.sh && chmod +x $SRC/run_build.sh && $SRC/run_build.sh 
+COPY run_monitor.sh /
+RUN chmod +x /run_monitor.sh

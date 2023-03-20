@@ -14,7 +14,11 @@
 #
 ################################################################################
 
-FROM gcr.io/oss-fuzz-base/base-builder@sha256:59fdabfe72127e145d8a387b68e883121bddd7cf391d600edb97ecbdacbc9ff8
+ARG parent_image
+FROM $parent_image
+
+ENV FUZZ_PROJECT=curl_curl_fuzzer_http
+
 RUN apt-get update && \
     apt-get install -y autoconf automake libtool bison re2c pkg-config
 
@@ -24,3 +28,11 @@ RUN git clone https://github.com/kkos/oniguruma.git php-src/oniguruma
 RUN git -C php-src/oniguruma/ checkout -f 14f5efb82321e26502caa2df3c58aa1c2d36c801
 WORKDIR php-src
 COPY build.sh $SRC/
+
+COPY run_build.sh $SRC/
+COPY benchmark.yaml /
+COPY run_fuzz.sh /
+
+RUN chmod +x /run_fuzz.sh && chmod +x $SRC/run_build.sh && $SRC/run_build.sh 
+COPY run_monitor.sh /
+RUN chmod +x /run_monitor.sh
