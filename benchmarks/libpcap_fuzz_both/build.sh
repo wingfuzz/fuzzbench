@@ -15,31 +15,27 @@
 #
 ################################################################################
 
-cd libpcap
+cd /libpcap
 # build project
-git apply ../patch.diff
-mkdir build
+mkdir -p build
 cd build
-cmake ..
+cmake -DDISABLE_DBUS=1 ..
 make
 
-
 # build fuzz targets
-for target in pcap filter both
-do
-    $CC $CFLAGS -I.. -c ../testprogs/fuzz/fuzz_$target.c -o fuzz_$target.o
-    $CXX $CXXFLAGS fuzz_$target.o -o $OUT/fuzz_$target libpcap.a $LIB_FUZZING_ENGINE
-done
+$CC $CFLAGS -I.. -c ../testprogs/fuzz/fuzz_both.c -o fuzz_both.o
+$CXX $CXXFLAGS fuzz_both.o -o $OUT/fuzz_both libpcap.a $LIB_FUZZING_ENGINE
 
 # export other associated stuff
 cd ..
 cp testprogs/fuzz/fuzz_*.options $OUT/
 # builds corpus
-cd $SRC/tcpdump/
+cd /tcpdump/
 zip -r fuzz_pcap_seed_corpus.zip tests/
 cp fuzz_pcap_seed_corpus.zip $OUT/
-cd $SRC/libpcap/testprogs/BPF
-mkdir corpus
+cd /libpcap/testprogs/BPF
+mkdir -p corpus
 ls *.txt | while read i; do tail -1 $i > corpus/$i; done
-zip -r fuzz_filter_seed_corpus.zip corpus/
-cp fuzz_filter_seed_corpus.zip $OUT/
+cp -r corpus/ $OUT/
+# zip -r fuzz_filter_seed_corpus.zip corpus/
+# cp fuzz_filter_seed_corpus.zip $OUT/

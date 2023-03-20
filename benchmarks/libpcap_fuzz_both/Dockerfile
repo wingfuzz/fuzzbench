@@ -17,18 +17,19 @@
 ARG parent_image
 FROM $parent_image
 
-ENV FUZZ_PROJECT=curl_curl_fuzzer_http
+ENV FUZZ_PROJECT=libpcap_fuzz_both
 
 RUN apt-get update && apt-get install -y make cmake flex bison
-RUN git clone --depth 1 https://github.com/the-tcpdump-group/libpcap.git libpcap
-# for corpus as wireshark
-RUN git clone --depth=1 https://github.com/the-tcpdump-group/tcpdump.git tcpdump
-WORKDIR $SRC
-COPY build.sh $SRC/
-COPY patch.diff $SRC/
+RUN git clone https://github.com/the-tcpdump-group/libpcap.git libpcap
+
+# For corpus as wireshark.
+RUN git clone https://github.com/the-tcpdump-group/tcpdump.git tcpdump && \
+    git -C tcpdump checkout 032e4923e5202ea4d5a6d1cead83ed1927135874
 
 
 COPY build.sh $SRC/
+
+
 COPY run_build.sh $SRC/
 COPY benchmark.yaml /
 COPY run_fuzz.sh /
