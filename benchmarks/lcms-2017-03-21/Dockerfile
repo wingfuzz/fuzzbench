@@ -33,7 +33,6 @@ COPY cms_transform_fuzzer.cc build.sh $SRC/
 ADD seeds /opt/seeds
 
 
-COPY build.sh $SRC/
 COPY run_build.sh $SRC/
 COPY benchmark.yaml /
 COPY run_fuzz.sh /
