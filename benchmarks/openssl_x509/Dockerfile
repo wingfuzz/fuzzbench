@@ -17,7 +17,7 @@
 ARG parent_image
 FROM $parent_image
 
-ENV FUZZ_PROJECT=curl_curl_fuzzer_http
+ENV FUZZ_PROJECT=openssl_x509
 
 RUN apt-get update && apt-get install -y make
 RUN git clone --depth 1 https://github.com/openssl/openssl.git
