@@ -17,7 +17,7 @@
 ARG parent_image
 FROM $parent_image
 
-ENV FUZZ_PROJECT=curl_curl_fuzzer_http
+ENV FUZZ_PROJECT=re2-2014-12-09
 
 RUN apt-get update && \
     apt-get install -y \

@@ -17,7 +17,7 @@
 ARG parent_image
 FROM $parent_image
 
-ENV FUZZ_PROJECT=curl_curl_fuzzer_http
+ENV FUZZ_PROJECT=sqlite3_ossfuzz
 
 RUN apt-get update &&\
     apt-get install -y gperf m4 gettext python3-pip \

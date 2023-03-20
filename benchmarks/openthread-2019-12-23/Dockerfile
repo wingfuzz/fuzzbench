@@ -13,8 +13,10 @@
 # limitations under the License.
 #
 ################################################################################
+ARG parent_image
+FROM $parent_image
 
-FROM gcr.io/oss-fuzz-base/base-builder
+ENV FUZZ_PROJECT=openthread-2019-12-23
 
 RUN apt-get update && \
     apt-get install -y \

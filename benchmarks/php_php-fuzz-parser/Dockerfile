@@ -17,7 +17,7 @@
 ARG parent_image
 FROM $parent_image
 
-ENV FUZZ_PROJECT=curl_curl_fuzzer_http
+ENV FUZZ_PROJECT=php_php-fuzz-parser
 
 RUN apt-get update && \
     apt-get install -y autoconf automake libtool bison re2c pkg-config

@@ -17,7 +17,7 @@
 ARG parent_image
 FROM $parent_image
 
-ENV FUZZ_PROJECT=curl_curl_fuzzer_http
+ENV FUZZ_PROJECT=zlib_zlib_uncompress_fuzzer
 
 RUN apt-get update && apt-get install -y make autoconf automake libtool
 RUN git clone --depth 1 -b develop https://github.com/madler/zlib.git
