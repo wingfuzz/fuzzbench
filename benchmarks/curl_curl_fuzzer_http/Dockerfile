@@ -18,9 +18,9 @@ ARG parent_image
 FROM $parent_image
 
 # Curl will be checked out to the commit hash specified in benchmark.yaml.
+RUN git clone https://github.com/curl/curl-fuzzer /src/curl_fuzzer
+RUN git -C /src/curl_fuzzer checkout dd486c1e5910e722e43c451d4de928ac80f5967d
 RUN git clone --depth 1 https://github.com/curl/curl.git /src/curl
-RUN git clone https://github.com/curl/curl-fuzzer.git /src/curl_fuzzer
-RUN git -C /src/curl_fuzzer checkout -f 9a48d437484b5ad5f2a97c0cab0d8bcbb5d058de
 
 # Use curl-fuzzer's scripts to get latest dependencies.
 RUN /src/curl_fuzzer/scripts/ossfuzzdeps.sh
