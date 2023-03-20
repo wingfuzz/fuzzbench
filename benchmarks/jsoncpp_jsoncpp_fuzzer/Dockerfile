@@ -14,8 +14,12 @@
 #
 ################################################################################
 
-FROM gcr.io/oss-fuzz-base/base-builder@sha256:8e56964113db5e06130b8bc5b94becb5d90a88e90c9b593f2ea24f33b0a467d0
+ARG parent_image
+FROM $parent_image
+ENV FUZZ_PROJECT=jsoncpp_jsoncpp_fuzzer
+
 RUN apt-get update && apt-get install -y build-essential make curl wget
+
 
 # Install latest cmake.
 RUN wget https://github.com/Kitware/CMake/releases/download/v3.14.5/cmake-3.14.5-Linux-x86_64.sh && \
@@ -23,7 +27,15 @@ RUN wget https://github.com/Kitware/CMake/releases/download/v3.14.5/cmake-3.14.5
     ./cmake-3.14.5-Linux-x86_64.sh --skip-license --prefix="/usr/local"
 
 RUN git clone --depth 1 https://github.com/open-source-parsers/jsoncpp
-WORKDIR jsoncpp
+#WORKDIR jsoncpp
 
 COPY build.sh $SRC/
+COPY run_build.sh $SRC/
+COPY benchmark.yaml /
+COPY run_fuzz.sh /
+
+RUN chmod +x /run_fuzz.sh && chmod +x $SRC/run_build.sh && $SRC/run_build.sh
+COPY run_monitor.sh /
+RUN chmod +x /run_monitor.sh
+
 
