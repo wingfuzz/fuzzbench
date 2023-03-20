@@ -151,8 +151,10 @@ def report(project, cov_values, crashe_values):
 
 def main():
     coverage_dir =  os.path.join(SHARED_DIR, "coverage")
+    project_number = 0
     score_dict = {}
     for i in os.listdir(coverage_dir):
+        project_number += 1
         project_dir = os.path.join(coverage_dir, i)
         coverage_file = os.path.join(project_dir, "coverage.txt")
         cov_values = read_coverage(coverage_file)
@@ -170,7 +172,8 @@ def main():
     file = open("report.txt", mode="a+", encoding="utf-8")
     sorted_values = sorted(score_dict.items(), key=lambda x: x[1])
     for k, v in sorted_values:
-        file.write(f"\tfuzzer: {k}, score: {v}\n")
+        score = v / project_number
+        file.write(f"\tfuzzer: {k}, score: {score}\n")
     file.write("--------------------------------------------\n\n")
 
 if __name__ == "__main__":
