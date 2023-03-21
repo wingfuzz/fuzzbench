@@ -2,7 +2,7 @@ from logger import logger
 from process import popen
 from config import *
 from utils import check_image_exist 
-
+import multiprocessing
 
 def build_base_image(rebuild:str) -> int:
     """ 构建一个基础镜像，后续镜像皆依赖于此
@@ -84,14 +84,17 @@ def build_fuzz_images(fuzzers:list[str], fuzz_targets:list[str], rebuild:str) ->
     """
     if build_base_image(rebuild):
         return 1
-    for fuzzer in fuzzers:
-        if build_fuzzer_image(fuzzer, rebuild):
+    fuzzer_args = [(fuzzer, rebuild) for fuzzer in fuzzers]
+    with multiprocessing.Pool(processes=4) as pool:
+        results = pool.starmap(build_fuzzer_image, fuzzer_args)
+        if 1 in results:
             return 1
-        for target in fuzz_targets:
-            if build_fuzz_target_image(fuzzer, target, rebuild):
-                return 1
+        
+    target_args = [(fuzzer, target, rebuild) for fuzzer in fuzzers for target in fuzz_targets]
+    with multiprocessing.Pool(processes=4) as pool:
+        pool.starmap(build_fuzz_target_image, target_args)
+        
             
-
 def build_coverage_images(fuzz_targets:list[str], rebuild:str):
     """ 构建被测项目的镜像
     Args:
