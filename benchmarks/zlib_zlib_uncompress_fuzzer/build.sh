@@ -15,14 +15,17 @@
 #
 ################################################################################
 
+
 ./configure
 make -j$(nproc) clean
-make -j$(nproc) all
+make -j$(nproc) libz.a
 
 # Do not make check as there are tests that fail when compiled with MSAN.
 # make -j$(nproc) check
 
 b=$(basename -s .cc $SRC/zlib_uncompress_fuzzer.cc)
-$CXX $CXXFLAGS -std=c++11 -I. $SRC/zlib_uncompress_fuzzer.cc -o $OUT/$b $LIB_FUZZING_ENGINE ./libz.a
+$CXX $CXXFLAGS -std=c++11 -I. /work/src/zlib_uncompress_fuzzer.cc -o /out/fuzz-target $LIB_FUZZING_ENGINE ./libz.a
 
 zip $OUT/seed_corpus.zip *.*
+
+cd /out && unzip seed_corpus.zip -d ./seeds

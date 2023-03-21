@@ -19,15 +19,17 @@ FROM $parent_image
 
 ENV FUZZ_PROJECT=zlib_zlib_uncompress_fuzzer
 
-RUN apt-get update && apt-get install -y make autoconf automake libtool
+RUN apt-get update && apt-get install -y make autoconf automake libtool clang-12 llvm-12 lld-12 libc++-12-dev libc++abi-12-dev
 RUN git clone --depth 1 -b develop https://github.com/madler/zlib.git
 WORKDIR zlib
-COPY build.sh zlib_uncompress_fuzzer.cc $SRC/
+COPY build.sh $SRC/
+COPY zlib_uncompress_fuzzer.cc $SRC/
 
 COPY run_build.sh $SRC/
 COPY benchmark.yaml /
 COPY run_fuzz.sh /
 
-RUN chmod +x /run_fuzz.sh && chmod +x $SRC/run_build.sh && $SRC/run_build.sh 
+RUN chmod +x /run_fuzz.sh && chmod +x $SRC/run_build.sh 
+#RUN $SRC/run_build.sh 
 COPY run_monitor.sh /
 RUN chmod +x /run_monitor.sh
