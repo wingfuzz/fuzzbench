@@ -4,14 +4,15 @@ from config import *
 from buildImages import build_fuzz_images, build_coverage_images
 from utils import check_image_exist, writeCsv
 import time 
+from typing import List 
 
 
-def run_docker(fuzzers:list[str], fuzz_targets:list[str], rebuild:str, cpus:float, memory:str, stop_timeout:int) -> None:
+def run_docker(fuzzers:List[str], fuzz_targets:List[str], rebuild:str, cpus:float, memory:str, stop_timeout:int) -> None:
     """ 运行 docker 构建镜像，运行镜像
 
     Args:
-        fuzzers (list[str]): 模糊测试器的列表
-        fuzz_targets (list[str]): 被测项目的列表
+        fuzzers (List[str]): 模糊测试器的列表
+        fuzz_targets (List[str]): 被测项目的列表
         rebuild (str): 是否重新构建镜像
         cpus (float): 容器所需的cpu数目
         memory (str): 容器所需的内存

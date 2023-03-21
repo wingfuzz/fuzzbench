@@ -3,6 +3,7 @@ from process import popen
 from config import *
 from utils import check_image_exist 
 import multiprocessing
+from typing import List
 
 def build_base_image(rebuild:str) -> int:
     """ 构建一个基础镜像，后续镜像皆依赖于此
@@ -71,12 +72,12 @@ def build_fuzz_target_image(fuzzer:str, target_project:str, rebuild:str) -> int:
     return code
 
 
-def build_fuzz_images(fuzzers:list[str], fuzz_targets:list[str], rebuild:str) -> int:
+def build_fuzz_images(fuzzers:List[str], fuzz_targets:List[str], rebuild:str) -> int:
     """ 构建 所有 fuzz 镜像
 
     Args:
-        fuzzers (list[str]): 模糊测试器的列表
-        fuzz_targets (list[str]): 被测项目的列表
+        fuzzers (List[str]): 模糊测试器的列表
+        fuzz_targets (List[str]): 被测项目的列表
         rebuild (str): 是否重新构建镜像
 
     Returns:
@@ -87,6 +88,7 @@ def build_fuzz_images(fuzzers:list[str], fuzz_targets:list[str], rebuild:str) ->
     fuzzer_args = [(fuzzer, rebuild) for fuzzer in fuzzers]
     with multiprocessing.Pool(processes=4) as pool:
         results = pool.starmap(build_fuzzer_image, fuzzer_args)
+        print(results)
         if 1 in results:
             return 1
         
@@ -95,7 +97,7 @@ def build_fuzz_images(fuzzers:list[str], fuzz_targets:list[str], rebuild:str) ->
         pool.starmap(build_fuzz_target_image, target_args)
         
             
-def build_coverage_images(fuzz_targets:list[str], rebuild:str):
+def build_coverage_images(fuzz_targets:List[str], rebuild:str):
     """ 构建被测项目的镜像
     Args:
         fuzzer (str): 模糊测试器的名字
