@@ -47,4 +47,5 @@ sapi/cli/php sapi/fuzzer/generate_parser_corpus.php
 cp sapi/fuzzer/dict/parser $OUT/php-fuzz-parser.dict
 
 cp sapi/fuzzer/php-fuzz-parser $OUT/
-zip -j $OUT/php-fuzz-parser_seed_corpus.zip sapi/fuzzer/corpus/parser/*
+mkdir -p $OUT/seeds
+cp -r sapi/fuzzer/corpus/parser/* $OUT/seeds
