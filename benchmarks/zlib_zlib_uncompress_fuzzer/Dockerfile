@@ -19,7 +19,7 @@ FROM $parent_image
 
 ENV FUZZ_PROJECT=zlib_zlib_uncompress_fuzzer
 
-RUN apt-get update && apt-get install -y make autoconf automake libtool clang-12 llvm-12 lld-12 libc++-12-dev libc++abi-12-dev
+RUN apt-get update && apt-get install -y make autoconf automake libtool
 RUN git clone --depth 1 -b develop https://github.com/madler/zlib.git
 WORKDIR zlib
 COPY build.sh $SRC/
