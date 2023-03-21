@@ -15,6 +15,7 @@
 #
 ################################################################################
 
+cd  $SRC/sqlite3
 mkdir bld
 cd bld
 
@@ -41,3 +42,7 @@ $CXX $CXXFLAGS \
     $LIB_FUZZING_ENGINE ./sqlite3.o
 
 cp $SRC/*.dict $SRC/*.zip $OUT/
+
+cd /out
+rm -rf /out/seeds
+unzip ossfuzz_seed_corpus.zip -d ./seeds
