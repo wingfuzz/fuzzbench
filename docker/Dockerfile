@@ -33,7 +33,7 @@ RUN apt-get update && \
     apt-get upgrade -y && \
     apt-get install -y \
     python3 python3-pip \
-    clang llvm libc++-dev libc++abi-dev  \
+    clang-12 llvm-12 lld-12 libc++-12-dev libc++abi-12-dev  \
     cmake make git \
     ninja-build \
     autoconf \
@@ -59,7 +59,7 @@ RUN apt-get update && \
     unzip \
     vim \
     ragel \
-    pkg-config
+    pkg-config 
     
 
 RUN pip config set global.index-url http://mirrors.dev.shuimuyulin.com/pypi/web/simple && \
