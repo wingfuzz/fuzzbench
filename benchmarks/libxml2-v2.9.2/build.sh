@@ -25,3 +25,5 @@ make -j $(nproc)
 
 $CXX $CXXFLAGS -std=c++11 $SRC/target.cc -I include .libs/libxml2.a \
     $FUZZER_LIB -o $OUT/fuzz-target
+
+wget -qO $OUT/xml.dict https://raw.githubusercontent.com/google/AFL/debe27037b9444bbf090a0ffbd5d24889bb887ae/dictionaries/xml.dict

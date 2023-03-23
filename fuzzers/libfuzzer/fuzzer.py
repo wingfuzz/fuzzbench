@@ -38,6 +38,7 @@ def build():
 def fuzz(input_corpus, output_corpus, target_binary):
     """Run fuzzer. Wrapper that uses the defaults when calling
     run_fuzzer."""
+    utils.create_seed_file_for_empty_corpus(input_corpus)
     run_fuzzer(input_corpus, output_corpus, target_binary)
 
 

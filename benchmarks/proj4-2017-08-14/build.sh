@@ -24,3 +24,6 @@ cp nad/* $OUT/seeds
 
 $CXX $CXXFLAGS -std=c++11 -I src test/fuzzers/standard_fuzzer.cpp \
     src/.libs/libproj.a $FUZZER_LIB -o $OUT/fuzz-target -lpthread
+
+
+wget -qO $OUT/proj4.dict https://raw.githubusercontent.com/google/fuzzing/master/dictionaries/proj4.dict

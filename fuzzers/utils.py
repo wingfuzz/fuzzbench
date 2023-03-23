@@ -226,9 +226,11 @@ def get_env(env_var, default_value=None):
 
 def create_seed_file_for_empty_corpus(input_corpus):
     """Create a fake seed file in an empty corpus, skip otherwise."""
-    if os.listdir(input_corpus):
-        # Input corpus has some files, no need of a seed file. Bail out.
-        return
+    if os.path.exists(input_corpus):
+        if os.listdir(input_corpus):
+            return
+    else:
+        os.mkdir(input_corpus)
 
     print('Creating a fake seed file in empty corpus directory.')
     default_seed_file = os.path.join(input_corpus, 'default_seed')

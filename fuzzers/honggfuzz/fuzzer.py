@@ -43,6 +43,7 @@ def fuzz(input_corpus, output_corpus, target_binary):
     output_corpus = os.path.join(output_corpus, 'corpus')
     os.makedirs(crashes_dir)
     os.makedirs(output_corpus)
+    utils.create_seed_file_for_empty_corpus(input_corpus)
 
     print('[fuzz] Running target with honggfuzz')
     command = [
