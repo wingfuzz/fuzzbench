@@ -9,13 +9,8 @@ from typing import Dict, List
 half_period = 360  #半衰期
 point = 30
 
-class fuzzzer_score:
-    project_name:str = ""
-    fuzzer_name:str = ""
-    score:float = 0
 
-
-def project_fuzzer_score(datas:Dict[str, Dict[str, float]]) -> None:
+def project_fuzzer_score(datas: Dict[str, Dict[str, float]]) -> None:
     """ 给 项目和fuzzer 的分数绘图
 
     Args:
@@ -32,8 +27,9 @@ def project_fuzzer_score(datas:Dict[str, Dict[str, float]]) -> None:
     for f in fuzzers:
         values = []
         for t in projects:
-            values.append(datas[t][f])
-        bar.add_yaxis(f, values)  
+            values.append(opts.BarItem(name=f, value=datas[t][f]))
+        sorted_values = sorted(values, key=lambda x: x.opts['value'], reverse=True)
+        bar.add_yaxis(f, sorted_values, label_opts=opts.LabelOpts(formatter="{b} - {c}"))
 
     # 将x轴和y轴交换
     bar.reversal_axis()
@@ -46,7 +42,6 @@ def project_fuzzer_score(datas:Dict[str, Dict[str, float]]) -> None:
     )
 
     bar.render('/mnt/d/work/2023/每个项目各个Fuzzer的得分.html')
-
 
 
 def fuzzer_score(datas:Dict[str,float]) -> None:
