@@ -33,7 +33,7 @@ def compression_work_dir_code():
     if os.path.exists(f"{ROOT_DIR_PATH}/docker/fuzzbench.tar.gz"):
         os.remove(f"{ROOT_DIR_PATH}/docker/fuzzbench.tar.gz")
                       
-    popen(f"tar -zcvf {ROOT_DIR_PATH}/docker/fuzzbench.tar.gz .")
+    popen(f"tar -zcf {ROOT_DIR_PATH}/docker/fuzzbench.tar.gz .")
 
 
 def unzip_work_dir_code():
