@@ -1,11 +1,77 @@
 import pandas as pd 
 import pyecharts.options as opts
 from pyecharts.charts import Line
+from pyecharts.charts import Bar
 import os 
 from config import SHARED_DIR
+from typing import Dict, List
 
 half_period = 360  #半衰期
 point = 30
+
+class fuzzzer_score:
+    project_name:str = ""
+    fuzzer_name:str = ""
+    score:float = 0
+
+
+def project_fuzzer_score(datas:Dict[str, Dict[str, float]]) -> None:
+    """ 给 项目和fuzzer 的分数绘图
+
+    Args:
+        datas (Dict[str, Dict[str, float]]): {项目：{fuzzer, score}, ...}
+    """
+
+    # 确定有多少项目和多少fuzzer 
+    projects = list(datas.keys())
+    fuzzers = datas[projects[0]].keys()
+    bar = Bar(init_opts=opts.InitOpts(width="1200px", height="876px", bg_color="white", page_title="开源FUZZ性能对比", is_horizontal_center=True))
+    # x轴数据
+    bar.add_xaxis(projects)
+
+    for f in fuzzers:
+        values = []
+        for t in projects:
+            values.append(datas[t][f])
+        bar.add_yaxis(f, values)  
+
+    # 将x轴和y轴交换
+    bar.reversal_axis()
+
+    # 配置柱状图的样式
+    bar.set_global_opts(
+        title_opts=opts.TitleOpts(title=None, subtitle=None, pos_left="15%"),
+        xaxis_opts=opts.AxisOpts(name="分数"),
+        yaxis_opts=opts.AxisOpts(name="项目"),
+    )
+
+    bar.render('/mnt/d/work/2023/每个项目各个Fuzzer的得分.html')
+
+
+
+def fuzzer_score(datas:Dict[str,float]) -> None:
+    """ 给最终的 fuzzer 得分绘图
+
+    Args:
+        datas (Dict[str,float]): {{fuzzer:score}, ...}
+    """
+
+    fuzzers = list(datas.keys())
+    values = list(datas.values())
+    bar = Bar(init_opts=opts.InitOpts(width="1200px", height="876px", bg_color="white", page_title="开源FUZZ性能对比", is_horizontal_center=True))
+    # x轴数据
+    bar.add_xaxis(fuzzers)
+    bar.add_yaxis("分数", values) 
+
+    # 配置柱状图的样式
+    bar.set_global_opts(
+        title_opts=opts.TitleOpts(title=None, subtitle=None, pos_left="15%"),
+        xaxis_opts=opts.AxisOpts(name="FUZZ"),
+        yaxis_opts=opts.AxisOpts(name="分数"),
+    )
+
+    bar.render('/mnt/d/work/2023/汇总所有项目的fuzzer得分.html')
+
 
 def weighted(values):
     """ 计算权值
@@ -39,15 +105,14 @@ def time_averaging(datas):
     return d
 
 
-def global_max(datas):
+def global_end(datas):
     d = {}
     for k in datas.keys():
-        d[k] = max(datas[k])
+        d[k] = datas[k][-1]
     return d
 
 
 def draw_line(datas, title, subtitle):
-    print(datas)
     line = Line(init_opts=opts.InitOpts(width="800px", height="400px", bg_color="white", page_title=f"开源FUZZ性能对比-{title}-{subtitle}"))
     line.add_xaxis(xaxis_data=list(range(point)))
 
@@ -97,7 +162,7 @@ def total_scores(total_scores_datas):
     max_value = total_scores_datas[global_cov_max_fuzzer]
     new_dict = {}
     for k, v in total_scores_datas.items():
-        new_dict[k] = v / max_value * 100
+        new_dict[k] = v / max_value
     return new_dict
 
 
@@ -106,7 +171,7 @@ def report(project, cov_values, crashe_values):
     p_name = f"Project: {project}\n"
     file.write(p_name)
     total_score_dict = {}
-    d = global_max(cov_values)
+    d = global_end(cov_values)
     for key, value in d.items():
         file.write(f"\tfuzzer: {key}, global coverage: {value}\n")
         try:
@@ -114,7 +179,7 @@ def report(project, cov_values, crashe_values):
         except KeyError:
             total_score_dict[key] = value 
 
-    d = global_max(crashe_values)
+    d = global_end(crashe_values)
     for key, value in d.items():
         file.write(f"\tfuzzer: {key}, global detection rate: {value}\n")
         try:
@@ -150,6 +215,7 @@ def report(project, cov_values, crashe_values):
 def main():
     coverage_dir =  os.path.join(SHARED_DIR, "coverage")
     project_number = 0
+    sum_score_dict = {}
     score_dict = {}
     for i in os.listdir(coverage_dir):
         project_number += 1
@@ -161,18 +227,31 @@ def main():
         crashe_values = read_crashe(crashe_file)
         draw_line(crashe_values, i, "Crashes")
         score = report(i, cov_values, crashe_values)
+        score_dict[i] = score
         for key, value in score.items():
             try:
-                score_dict[key] += value 
+                sum_score_dict[key] += value 
             except KeyError:
-                score_dict[key] = value 
+                sum_score_dict[key] = value 
 
+    project_fuzzer_score(score_dict)
+
+    # 最后的汇总
     file = open("report.txt", mode="a+", encoding="utf-8")
-    sorted_values = sorted(score_dict.items(), key=lambda x: x[1])
+    sorted_values = sorted(sum_score_dict.items(), key=lambda x: x[1], reverse=True)
+    file.write("\n")
+    file.write("--------------------------------------------\n")
+    file.write("--------------FUZZER分数排名-----------------\n")
+    file.write("--------------------------------------------\n")
+    sorted_scores = {}
     for k, v in sorted_values:
-        score = v / project_number
+        score = v / project_number * 100
+        sorted_scores[k] = score
         file.write(f"\tfuzzer: {k}, score: {score}\n")
     file.write("--------------------------------------------\n\n")
+    fuzzer_score(sorted_scores)
+
+    
 
 if __name__ == "__main__":
     main()
