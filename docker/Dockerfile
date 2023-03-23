@@ -19,7 +19,7 @@ ENV DEBIAN_FRONTEND noninteractive
 ENV ASAN_OPTIONS="abort_on_error=1:symbolize=0:handle_abort=1:handle_sigill=1"
 ENV UBSAN_OPTIONS="abort_on_error=1:print_stacktrace=1:report_error_type=1:symbolize=0"
 
-ENV ALL_PROXY="http://192.168.221.1:10809"
+ENV ALL_PROXY="http://192.168.4.104:10809"
 
 RUN mv /etc/apt/sources.list /etc/apt/sources.list-back && echo \
     "deb http://mirrors.dev.shuimuyulin.com/ubuntu/ focal main restricted universe multiverse\n\
