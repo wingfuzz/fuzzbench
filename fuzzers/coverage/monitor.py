@@ -8,12 +8,18 @@ from datetime import datetime
 
 fuzzer_queue_out_path = {
     "afl": "output/queue",
-    "aflplusplus": "output/default/queue"
+    "aflplusplus": "output/default/queue",
+    "libfuzzer": "output/corpus",
+    "honggfuzz": "output/corpus",
+    "eclipser": "output/eclipser_output/queue",
 }
 
 fuzzer_crashe_out_path = {
     "afl": "output/crashes",
-    "aflplusplus": "output/default/crashes"
+    "aflplusplus": "output/default/crashes",
+    "libfuzzer": "output/crashes",
+    "honggfuzz": "output/crashes",
+    "eclipser": "output/eclipser_output/crashes",
 }
 
 
