@@ -9,6 +9,10 @@ from typing import Dict, List
 half_period = 360  #半衰期
 point = 30
 
+output = "./analyze_output"
+if os.path.exists(output):
+    os.mkdir(output)
+
 
 def project_fuzzer_score(datas: Dict[str, Dict[str, float]]) -> None:
     """ 给 项目和fuzzer 的分数绘图
@@ -41,7 +45,7 @@ def project_fuzzer_score(datas: Dict[str, Dict[str, float]]) -> None:
         yaxis_opts=opts.AxisOpts(name="项目"),
     )
 
-    bar.render('/mnt/d/work/2023/每个项目各个Fuzzer的得分.html')
+    bar.render('./output/每个项目各个Fuzzer的得分.html')
 
 
 def fuzzer_score(datas:Dict[str,float]) -> None:
@@ -65,7 +69,7 @@ def fuzzer_score(datas:Dict[str,float]) -> None:
         yaxis_opts=opts.AxisOpts(name="分数"),
     )
 
-    bar.render('/mnt/d/work/2023/汇总所有项目的fuzzer得分.html')
+    bar.render('./output/汇总所有项目的fuzzer得分.html')
 
 
 def weighted(values):
@@ -124,8 +128,7 @@ def draw_line(datas, title, subtitle):
             xaxis_opts=opts.AxisOpts(type_="category", boundary_gap=False),
     )
     line.set_series_opts(label_opts=opts.LabelOpts(is_show=False))
-    save_path = os.path.join("/mnt/d/work/2023", f"{title}-{subtitle}.html")
-    line.render(save_path)
+    line.render(f"./output/{title}-{subtitle}.html")
     print(f"{save_path} written.")
 
 
@@ -162,7 +165,7 @@ def total_scores(total_scores_datas):
 
 
 def report(project, cov_values, crashe_values):
-    file = open("report.txt", mode="a+", encoding="utf-8")
+    file = open("./output/report.txt", mode="a+", encoding="utf-8")
     p_name = f"Project: {project}\n"
     file.write(p_name)
     total_score_dict = {}
@@ -232,7 +235,7 @@ def main():
     project_fuzzer_score(score_dict)
 
     # 最后的汇总
-    file = open("report.txt", mode="a+", encoding="utf-8")
+    file = open("./output/report.txt", mode="a+", encoding="utf-8")
     sorted_values = sorted(sum_score_dict.items(), key=lambda x: x[1], reverse=True)
     file.write("\n")
     file.write("--------------------------------------------\n")
