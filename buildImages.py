@@ -85,16 +85,25 @@ def build_fuzz_images(fuzzers:List[str], fuzz_targets:List[str], rebuild:str) ->
     """
     if build_base_image(rebuild):
         return 1
-    fuzzer_args = [(fuzzer, rebuild) for fuzzer in fuzzers]
-    with multiprocessing.Pool(processes=4) as pool:
-        results = pool.starmap(build_fuzzer_image, fuzzer_args)
-        print(results)
-        if 1 in results:
+    
+    for fuzzer in fuzzers:
+        if build_fuzzer_image(fuzzer, rebuild):
             return 1
+
+    for target in fuzz_targets:
+        if build_fuzz_target_image(fuzzer, target, rebuild):
+            return 1
+
+    # fuzzer_args = [(fuzzer, rebuild) for fuzzer in fuzzers]
+    # with multiprocessing.Pool(processes=4) as pool:
+    #     results = pool.starmap(build_fuzzer_image, fuzzer_args)
+    #     print(results)
+    #     if 1 in results:
+    #         return 1
         
-    target_args = [(fuzzer, target, rebuild) for fuzzer in fuzzers for target in fuzz_targets]
-    with multiprocessing.Pool(processes=4) as pool:
-        pool.starmap(build_fuzz_target_image, target_args)
+    # target_args = [(fuzzer, target, rebuild) for fuzzer in fuzzers for target in fuzz_targets]
+    # with multiprocessing.Pool(processes=4) as pool:
+    #     pool.starmap(build_fuzz_target_image, target_args)
         
             
 def build_coverage_images(fuzz_targets:List[str], rebuild:str):
