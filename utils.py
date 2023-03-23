@@ -4,6 +4,8 @@ from process import popen
 from config import *
 import csv 
 from typing import List
+import shutil
+
 
 def check_image_exist(image_name:str) -> bool:
     """ 检查基础镜像是否存在， 是否重新构建
@@ -26,6 +28,8 @@ def check_image_exist(image_name:str) -> bool:
 def compression_work_dir_code():
     """ 打包项目代码
     """
+    if os.path.exists(f"{ROOT_DIR_PATH}/__pycache__"):
+        shutil.rmtree(f"{ROOT_DIR_PATH}/__pycache__")
     if os.path.exists(f"{ROOT_DIR_PATH}/docker/fuzzbench.tar.gz"):
         os.remove(f"{ROOT_DIR_PATH}/docker/fuzzbench.tar.gz")
                       
