@@ -56,9 +56,9 @@ def build_fuzz_target_image(fuzzer:str, target_project:str, rebuild:str) -> int:
         int: 成功返回0 失败返回1
     """
     image_name = os.path.join(DOCKER_IMAGE_BASE_TAG, f"{fuzzer}_{target_project}")
+    logger.info(f"build fuzz target image {image_name} start.")
     if rebuild == "OFF" and check_image_exist(image_name):
             return 0
-    logger.info(f"build fuzz target image {image_name} start.")
     docker_file_path =  os.path.join(ROOT_DIR_PATH, "benchmarks", target_project)
     docker_file = os.path.join(docker_file_path, "Dockerfile")
     fuzzer_image_name = os.path.join(DOCKER_IMAGE_BASE_TAG, fuzzer)
@@ -83,6 +83,8 @@ def build_fuzz_images(fuzzers:List[str], fuzz_targets:List[str], rebuild:str) ->
     Returns:
         int: 成功返回0 失败返回1
     """
+    target_args = [(fuzzer, target) for fuzzer in fuzzers for target in fuzz_targets]
+    print("build:", target_args)
     if build_base_image(rebuild):
         return 1
     
