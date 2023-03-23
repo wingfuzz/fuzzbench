@@ -16,6 +16,20 @@ FROM dev.shuimuyulin.com/fuzzbench/base-image
 
 ENV FUZZER_NAME="eclipser"
 
+RUN mv /etc/apt/sources.list /etc/apt/sources.list-back && echo \
+    "deb http://mirrors.dev.shuimuyulin.com/ubuntu/ focal main restricted universe multiverse\n\
+    deb http://mirrors.dev.shuimuyulin.com/ubuntu/ focal-security main restricted universe multiverse\n\
+    deb http://mirrors.dev.shuimuyulin.com/ubuntu/ focal-updates main restricted universe multiverse\n\
+    deb http://mirrors.dev.shuimuyulin.com/ubuntu/ focal-proposed main restricted universe multiverse\n\
+    #deb http://mirrors.dev.shuimuyulin.com/ubuntu/ focal-backports main restricted universe multiverse\n\
+    deb-src http://mirrors.dev.shuimuyulin.com/ubuntu/ focal main restricted universe multiverse\n\
+    deb-src http://mirrors.dev.shuimuyulin.com/ubuntu/ focal-security main restricted universe multiverse\n\
+    deb-src http://mirrors.dev.shuimuyulin.com/ubuntu/ focal-updates main restricted universe multiverse\n\
+    deb-src http://mirrors.dev.shuimuyulin.com/ubuntu/ focal-proposed main restricted universe multiverse\n\
+    #deb http://mirrors.dev.shuimuyulin.com/ubuntu/ focal-backports main restricted universe multiverse\n\
+    " > /etc/apt/sources.list 
+
+
 # Upgrade to avoid certs errors
 RUN apt-get update && apt-get upgrade -y && \
     apt-get install -y apt-utils apt-transport-https ca-certificates
