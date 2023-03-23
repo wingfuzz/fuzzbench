@@ -35,21 +35,21 @@ def run_docker(fuzzers:List[str], fuzz_targets:List[str], rebuild:str, cpus:floa
     build_fuzz_images(fuzzers, fuzz_targets, rebuild)
 
 
-    # for c in run_images.keys():
-    #     container_name = c 
-    #     image_name = run_images[c]
-    #     if "coverage" in container_name:
-    #         pass 
-    #     else:
-    #         code, _ = popen(f"docker run -d --rm --name {container_name} --cpus {cpus} --memory {memory} --volume {SHARED_DIR}:{SHARED_DIR} {image_name} /bin/sh /run_fuzz.sh")
-    #         if code != 0:
-    #             exit(code)
+    for c in run_images.keys():
+        container_name = c 
+        image_name = run_images[c]
+        if "coverage" in container_name:
+            pass 
+        else:
+            code, _ = popen(f"docker run -d --rm --name {container_name} --cpus {cpus} --memory {memory} --volume {SHARED_DIR}:{SHARED_DIR} {image_name} /bin/sh /run_fuzz.sh")
+            if code != 0:
+                exit(code)
 
-    # if "coverage" in fuzzers:
-    #     for t in fuzz_targets:
-    #         image_name = os.path.join(DOCKER_IMAGE_BASE_TAG, f"coverage_{t}")
-    #         code, _ = popen(f"docker run -d --rm --name coverage_{t} --cpus 1 --memory 2G --volume {SHARED_DIR}:{SHARED_DIR} --volume /root/opensourcefuzzbench:/work/fuzzbench {image_name} /bin/sh /run_monitor.sh")
-    #         if code != 0:
-    #             exit(code)
+    if "coverage" in fuzzers:
+        for t in fuzz_targets:
+            image_name = os.path.join(DOCKER_IMAGE_BASE_TAG, f"coverage_{t}")
+            code, _ = popen(f"docker run -d --rm --name coverage_{t} --cpus 4 --memory 4G --volume {SHARED_DIR}:{SHARED_DIR} --volume /root/opensourcefuzzbench:/work/fuzzbench {image_name} /bin/sh /run_monitor.sh")
+            if code != 0:
+                exit(code)
         
 
