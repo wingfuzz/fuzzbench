@@ -43,6 +43,12 @@ export CPPFLAGS="                                     \
     -DOPENTHREAD_CONFIG_UDP_FORWARD_ENABLE=1"
 ./configure --enable-fuzz-targets --enable-cli --enable-ftd --enable-joiner \
     --enable-ncp --disable-docs
+
+#如果当前编译器是clang 关闭类型转换检测
+# if [ "$FUZZER_NAME" = "libfuzzer" ]; then
+#   export CXXFLAGS="$CXXFLAGS -Wno-conversion"
+# fi
+
 make V=1 -j $(nproc)
 
 cp tests/fuzz/ip6-send-fuzzer $OUT/fuzz-target
