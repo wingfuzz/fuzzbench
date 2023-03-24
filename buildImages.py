@@ -88,10 +88,12 @@ def build_fuzz_images(fuzzers:List[str], fuzz_targets:List[str], rebuild:str) ->
     if build_base_image(rebuild):
         return 1
     
+    print("build fuzzers")
     for fuzzer in fuzzers:
         if build_fuzzer_image(fuzzer, rebuild):
             return 1
-
+        
+    print("build projects")
     for target in fuzz_targets:
         if build_fuzz_target_image(fuzzer, target, rebuild):
             return 1
