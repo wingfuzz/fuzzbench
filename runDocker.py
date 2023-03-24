@@ -1,7 +1,7 @@
 from logger import logger
 from process import popen, timeout_popen
 from config import * 
-from buildImages import build_fuzz_images, build_coverage_images
+from buildImages import build_fuzz_images
 from utils import check_image_exist, writeCsv
 import time 
 from typing import List 
