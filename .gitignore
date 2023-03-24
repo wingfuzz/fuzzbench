@@ -3,3 +3,4 @@ __pycache__/
 *.log
 fuzzbench.tar.gz
 report.txt
+analyze_output/
