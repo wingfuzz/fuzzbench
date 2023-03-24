@@ -176,24 +176,24 @@ def build(*args):  # pylint: disable=too-many-branches,too-many-statements
         # twice in the same directory without this.
         utils.build_benchmark(os.environ.copy())
 
-    if 'cmplog' in build_modes and 'qemu' not in build_modes:
+    # if 'cmplog' in build_modes and 'qemu' not in build_modes:
 
-        # CmpLog requires an build with different instrumentation.
-        new_env = os.environ.copy()
-        new_env['AFL_LLVM_CMPLOG'] = '1'
+    #     # CmpLog requires an build with different instrumentation.
+    #     new_env = os.environ.copy()
+    #     new_env['AFL_LLVM_CMPLOG'] = '1'
 
-        # For CmpLog build, set the OUT and FUZZ_TARGET environment
-        # variable to point to the new CmpLog build directory.
-        cmplog_build_directory = get_cmplog_build_directory(build_directory)
-        os.mkdir(cmplog_build_directory)
-        new_env['OUT'] = cmplog_build_directory
-        fuzz_target = os.getenv('FUZZ_TARGET')
-        if fuzz_target:
-            new_env['FUZZ_TARGET'] = os.path.join(cmplog_build_directory,
-                                                  os.path.basename(fuzz_target))
+    #     # For CmpLog build, set the OUT and FUZZ_TARGET environment
+    #     # variable to point to the new CmpLog build directory.
+    #     cmplog_build_directory = get_cmplog_build_directory(build_directory)
+    #     os.mkdir(cmplog_build_directory)
+    #     new_env['OUT'] = cmplog_build_directory
+    #     fuzz_target = os.getenv('FUZZ_TARGET')
+    #     if fuzz_target:
+    #         new_env['FUZZ_TARGET'] = os.path.join(cmplog_build_directory,
+    #                                               os.path.basename(fuzz_target))
 
-        print('Re-building benchmark for CmpLog fuzzing target')
-        utils.build_benchmark(env=new_env)
+    #     print('Re-building benchmark for CmpLog fuzzing target')
+    #     utils.build_benchmark(env=new_env)
 
     if 'symcc' in build_modes:
 
