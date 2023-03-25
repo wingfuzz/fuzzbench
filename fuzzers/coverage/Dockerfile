@@ -16,7 +16,8 @@ RUN apt-get update && \
         # for QEMU mode
         ninja-build \
         gcc-$(gcc --version|head -n1|sed 's/\..*//'|sed 's/.* //')-plugin-dev \
-        libstdc++-$(gcc --version|head -n1|sed 's/\..*//'|sed 's/.* //')-dev 
+        libstdc++-$(gcc --version|head -n1|sed 's/\..*//'|sed 's/.* //')-dev \
+        clang-12 llvm-12 lld-12 libc++-12-dev libc++abi-12-dev
         
 # Download afl++.
 RUN git clone -b dev https://github.com/AFLplusplus/AFLplusplus /afl && \
@@ -28,7 +29,7 @@ RUN git clone -b dev https://github.com/AFLplusplus/AFLplusplus /afl && \
 # Set AFL_NO_X86 to skip flaky tests.
 RUN cd /afl && \
     unset CFLAGS CXXFLAGS && \
-    export CC=clang AFL_NO_X86=1 LLVM_CONFIG=llvm-config-12 && \
+    export CC=clang-12 AFL_NO_X86=1 LLVM_CONFIG=llvm-config-12 && \
     PYTHON_INCLUDE=/ make -j && \
     make install && \
     cp utils/aflpp_driver/libAFLDriver.a / 

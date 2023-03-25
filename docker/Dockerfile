@@ -33,7 +33,7 @@ RUN apt-get update && \
     apt-get upgrade -y && \
     apt-get install -y \
     python3 python3-pip \
-    gcc g++ clang-12 llvm-12 lld-12 libc++-12-dev libc++abi-12-dev  \
+    gcc g++ clang llvm lld libc++-dev libc++abi-dev  \
     cmake make git \
     ninja-build \
     autoconf \
@@ -59,9 +59,7 @@ RUN apt-get update && \
     unzip \
     vim \
     ragel \
-    pkg-config && \
-    ln -s /usr/bin/clang-12 /usr/bin/clang && \
-    ln -s /usr/bin/clang++-12 /usr/bin/clang++
+    pkg-config && 
     
 
 RUN pip config set global.index-url http://mirrors.dev.shuimuyulin.com/pypi/web/simple && \
