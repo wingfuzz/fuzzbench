@@ -29,7 +29,10 @@ def project_fuzzer_score(datas: Dict[str, Dict[str, float]]) -> None:
     for f in fuzzers:
         values = []
         for t in projects:
-            values.append(opts.BarItem(name=f, value=datas[t][f]))
+            try:
+                values.append(opts.BarItem(name=f, value=datas[t][f]))
+            except KeyError as e:
+                print(f"{e} not exits")
         sorted_values = sorted(values, key=lambda x: x.opts['value'], reverse=True)
         bar.add_yaxis(f, sorted_values, label_opts=opts.LabelOpts(formatter="{b} - {c}"))
 
