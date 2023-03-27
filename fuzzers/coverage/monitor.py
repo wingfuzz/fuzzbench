@@ -69,7 +69,6 @@ async def write_crashe(fuzzer:str, crashe_number:int):
 
 async def get_crashe(output_ls:str):
     """ bug去重
-
     Args:
         output_ls (str): 所有的case输出
 
@@ -85,7 +84,7 @@ async def get_crashe(output_ls:str):
             bo = pattern.match(line)
             if bo != None:
                 binary, offset = bo.groups()
-                stacks.append([binary, offset])
+                stacks.append((binary, offset))
         if len(stacks) != 0:
             problems.add(tuple(stacks))
 
