@@ -59,7 +59,7 @@ RUN apt-get update && \
     unzip \
     vim \
     ragel \
-    pkg-config && 
+    pkg-config 
     
 
 RUN pip config set global.index-url http://mirrors.dev.shuimuyulin.com/pypi/web/simple && \
