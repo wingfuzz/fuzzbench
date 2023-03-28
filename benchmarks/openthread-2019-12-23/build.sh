@@ -48,8 +48,9 @@ export CPPFLAGS="                                     \
 # if [ "$FUZZER_NAME" = "libfuzzer" ]; then
 #   export CXXFLAGS="$CXXFLAGS -Wno-conversion"
 # fi
+echo "$CXXFLAGS"
 
-make V=1 -j $(nproc)
+make V=1 -j $(nproc) CXXFLAGS+=-Wno-conversion
 
 cp tests/fuzz/ip6-send-fuzzer $OUT/fuzz-target
 cd /out 
