@@ -2,7 +2,7 @@ import asyncio
 import os
 from config import SHARED_DIR
 import re
-from process import popen
+from process import popen, popen_with_output
 from datetime import datetime
 
 
@@ -53,7 +53,7 @@ async def monitor_queue(fuzzer, output_path:str, fuzz_target:str):
         output_path (str): 需要监控的目录
     """
     print(f"monitor {fuzzer} queue {output_path}")
-    code, out = popen(f"/afl/afl-showmap -C -i {output_path} -o /dev/null -- {fuzz_target} @@")
+    code, out = popen_with_output(f"/afl/afl-showmap -C -i {output_path} -o /dev/null -- {fuzz_target} @@")
     if code == 0:
         await get_coverage(fuzzer, out)
 
@@ -101,7 +101,7 @@ async def monitor_crashes(fuzzer, fuzz_target, output_path:str):
     output_ls = []
     for i in ls:
         case_path = os.path.join(output_path, i)
-        code, out = popen(f"{fuzz_target} {case_path}")
+        code, out = popen_with_output(f"{fuzz_target} {case_path}")
         if code == 0:
             if len(out) != 0:
                 output_ls.append(out)

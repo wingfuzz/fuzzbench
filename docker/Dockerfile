@@ -14,12 +14,13 @@
 
 FROM ubuntu:20.04
 
-ENV DEBIAN_FRONTEND noninteractive
-
-ENV ASAN_OPTIONS="abort_on_error=1:symbolize=0:handle_abort=1:handle_sigill=1"
-ENV UBSAN_OPTIONS="abort_on_error=1:print_stacktrace=1:report_error_type=1:symbolize=0"
-
-ENV ALL_PROXY="http://192.168.4.104:10809"
+ENV DEBIAN_FRONTEND=noninteractive \
+    ASAN_OPTIONS="abort_on_error=1:symbolize=0:handle_abort=1:handle_sigill=1" \
+    UBSAN_OPTIONS="abort_on_error=1:print_stacktrace=1:report_error_type=1:symbolize=0" \
+    WORK=/work \
+    SRC=$WORK/src \
+    OUT=/out \
+    ROOT_DIR=/src
 
 RUN mv /etc/apt/sources.list /etc/apt/sources.list-back && echo \
     "deb http://mirrors.dev.shuimuyulin.com/ubuntu/ focal main restricted universe multiverse\n\
@@ -27,13 +28,12 @@ RUN mv /etc/apt/sources.list /etc/apt/sources.list-back && echo \
     deb http://mirrors.dev.shuimuyulin.com/ubuntu/ focal-updates main restricted universe multiverse\n\
     deb http://mirrors.dev.shuimuyulin.com/ubuntu/ focal-proposed main restricted universe multiverse\n\
     #deb http://mirrors.dev.shuimuyulin.com/ubuntu/ focal-backports main restricted universe multiverse\n\
-    " > /etc/apt/sources.list 
-
-RUN apt-get update && \
+    " > /etc/apt/sources.list && \
+    apt-get update && \
     apt-get upgrade -y && \
     apt-get install -y \
     python3 python3-pip \
-    gcc g++ clang llvm lld libc++-dev libc++abi-dev  \
+    gcc g++ clang llvm lld libc++-dev libc++abi-dev \
     cmake make git \
     ninja-build \
     autoconf \
@@ -59,24 +59,16 @@ RUN apt-get update && \
     unzip \
     vim \
     ragel \
-    pkg-config 
-    
-
-RUN pip config set global.index-url http://mirrors.dev.shuimuyulin.com/pypi/web/simple && \
+    pkg-config && \
+    pip config set global.index-url http://mirrors.dev.shuimuyulin.com/pypi/web/simple && \
     pip config set install.trusted-host mirrors.dev.shuimuyulin.com && \
-    pip3 install --upgrade pip 
-
-ENV WORK /work
-RUN mkdir -p $WORK
-ENV SRC $WORK/src
-RUN mkdir -p $SRC
-
-ENV OUT /out
-RUN mkdir -p $OUT
-
-ENV ROOT_DIR=/src
+    pip3 install --upgrade pip && \
+    apt-get clean && \
+    mkdir -p $WORK && \
+    mkdir -p $SRC && \
+    mkdir -p $OUT && \
+    mkdir -p /work/fuzzbench
 
 COPY fuzzbench.tar.gz /work
-RUN mkdir -p /work/fuzzbench
 RUN tar -zxvf /work/fuzzbench.tar.gz -C /work/fuzzbench
 
