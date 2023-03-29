@@ -41,7 +41,7 @@ def run_docker(fuzzers:List[str], fuzz_targets:List[str], rebuild:str, cpus:floa
             pass 
         else:
             if check_image_exist(image_name):
-                code, _ = popen(f"docker run -d --rm --name {container_name} --cpus {cpus} --memory {memory} --volume {SHARED_DIR}:{SHARED_DIR} {image_name} /bin/sh /run_fuzz.sh")
+                code, _ = popen(f"docker run -d --name {container_name} --cpus {cpus} --memory {memory} --volume $PWD/output:{SHARED_DIR} {image_name} /bin/sh /run_fuzz.sh")
                 if code != 0:
                     exit(code)
             else:
@@ -51,7 +51,7 @@ def run_docker(fuzzers:List[str], fuzz_targets:List[str], rebuild:str, cpus:floa
         for t in fuzz_targets:
             image_name = os.path.join(DOCKER_IMAGE_BASE_TAG, f"coverage_{t}")
             if check_image_exist(image_name):
-                code, _ = popen(f"docker run -d --rm --name coverage_{t} --cpus {cpus} --memory {memory} --volume {SHARED_DIR}:{SHARED_DIR} --volume $PWD/output:/work/fuzzbench {image_name} /bin/sh /run_monitor.sh")
+                code, _ = popen(f"docker run -d --name coverage_{t} --cpus {cpus} --memory {memory} --volume $PWD/output:{SHARED_DIR} {image_name} /bin/sh /run_monitor.sh")
                 if code != 0:
                     exit(code)
             else:
