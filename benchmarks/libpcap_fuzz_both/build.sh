@@ -20,8 +20,8 @@ cd /libpcap
 rm -rf build
 mkdir -p build
 cd build
-cmake -DDISABLE_DBUS=1 ..
-make
+cmake .. -DDISABLE_DBUS=1 -DDISABLE_RDMA=1 -DBUILD_WITH_LIBNL=OFF -DDISABLE_LINUX_USBMON=ON -DDISABLE_BLUETOOTH=ON -DDISABLE_NETMAP=ON -DDISABLE_DPDK=ON
+make -j $(nproc)
 
 # build fuzz targets
 $CC $CFLAGS -I.. -c ../testprogs/fuzz/fuzz_both.c -o fuzz_both.o
