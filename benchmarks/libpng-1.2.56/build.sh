@@ -16,6 +16,7 @@
 tar xf libpng-1.2.56.tar.gz
 
 cd libpng-1.2.56
+make clean distclean || echo "no need to clean"
 ./configure
 make -j $(nproc)
 

@@ -17,6 +17,7 @@
 
 # build oniguruma and link statically
 pushd oniguruma
+make clean distclean || echo "no need to clean"
 autoreconf -vfi
 ./configure
 make -j$(nproc)
@@ -29,6 +30,7 @@ export CFLAGS="$CFLAGS -fno-sanitize=object-size"
 export CXXFLAGS="$CXXFLAGS -fno-sanitize=object-size"
 
 # build project
+make clean distclean || echo "no need to clean"
 ./buildconf
 ./configure \
     --disable-all \

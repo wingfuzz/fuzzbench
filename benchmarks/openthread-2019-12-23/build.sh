@@ -50,6 +50,11 @@ export CPPFLAGS="                                     \
 # fi
 echo "$CXXFLAGS"
 
+if [ "$FUZZER_NAME" == "honggfuzz" ]; then
+    #honggfuzz会干扰configure，使strlcpy错误判断为存在，实际不存在，导致编译出错。这里修复这个问题
+    echo "#undef HAVE_STRLCPY" >> /openthread/include/openthread-config-generic.h
+fi
+
 make V=1 -j $(nproc) CXXFLAGS+=-Wno-conversion
 
 cp tests/fuzz/ip6-send-fuzzer $OUT/fuzz-target

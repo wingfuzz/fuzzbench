@@ -17,6 +17,7 @@
 
 cd /libpcap
 # build project
+rm -rf build
 mkdir -p build
 cd build
 cmake -DDISABLE_DBUS=1 ..
