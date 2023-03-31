@@ -15,6 +15,7 @@
 
 cd harfbuzz
 git checkout f73a87d9a8c76a181794b74b527ea268048f78e3
+make clean distclean || echo "not need to clean"
 ./autogen.sh
 (cd ./src/hb-ucdn && CCLD="$CXX $CXXFLAGS" make)
 CCLD="$CXX $CXXFLAGS" ./configure --enable-static --disable-shared \

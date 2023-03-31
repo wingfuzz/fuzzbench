@@ -15,6 +15,7 @@
 
 cd Little-CMS
 git checkout f9d75ccef0b54c9f4167d95088d4727985133c52
+make clean distclean || echo "no need to clean"
 ./autogen.sh
 ./configure
 make -j $(nproc)

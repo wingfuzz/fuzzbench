@@ -1,6 +1,6 @@
 
 
-from process import popen
+from process import popen, popen_with_output
 from config import *
 import csv 
 from typing import List
@@ -13,7 +13,7 @@ def check_image_exist(image_name:str) -> bool:
     Returns:
         bool: 镜像存在则为真， 镜像不存在则为假
     """
-    code, ret = popen('docker images --format "{{.Repository}}"')
+    code, ret = popen_with_output('docker images --format "{{.Repository}}"')
     if code:
         return False
     out_lines = ret.split("\n")

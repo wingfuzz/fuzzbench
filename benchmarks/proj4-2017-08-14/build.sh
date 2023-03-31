@@ -15,12 +15,15 @@
 
 cd PROJ
 git checkout d00501750b210a73f9fb107ac97a683d4e3d8e7a
+make clean distclean || echo "no need to clean"
 ./autogen.sh
 ./configure
 make -j $(nproc)
 
 mkdir $OUT/seeds
 cp nad/* $OUT/seeds
+
+rm -f `find $OUT/seeds/ -size +999k` || echo "no need to trim seeds"
 
 $CXX $CXXFLAGS -std=c++11 -I src test/fuzzers/standard_fuzzer.cpp \
     src/.libs/libproj.a $FUZZER_LIB -o $OUT/fuzz-target -lpthread
