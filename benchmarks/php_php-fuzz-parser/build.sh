@@ -15,6 +15,13 @@
 #
 ################################################################################
 
+
+if [ "$FUZZER_NAME" = "coverage" ]; then
+    export BUILD_MODES="pcguard"
+    export CC="/afl/afl-cc"
+    export CXX="/afl/afl-c++"
+fi
+
 # build oniguruma and link statically
 pushd oniguruma
 autoreconf -vfi
