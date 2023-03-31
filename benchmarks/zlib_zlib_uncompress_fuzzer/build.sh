@@ -24,8 +24,11 @@ make -j$(nproc) libz.a
 # make -j$(nproc) check
 
 b=$(basename -s .cc $SRC/zlib_uncompress_fuzzer.cc)
-$CXX $CXXFLAGS -std=c++11 -I. /work/src/zlib_uncompress_fuzzer.cc -o /out/fuzz-target $LIB_FUZZING_ENGINE ./libz.a
+$CXX $CXXFLAGS -std=c++11 -I. /work/src/zlib_uncompress_fuzzer.cc -o $OUT/fuzz-target $LIB_FUZZING_ENGINE ./libz.a
+echo "CXXFLAGS $CXXFLAGS"
 
 zip $OUT/seed_corpus.zip *.*
 rm -rf /out/seeds
-cd /out && unzip seed_corpus.zip -d ./seeds
+
+unzip /out/seed_corpus.zip -d /out/seeds
+find /out/seeds/ -size +999k -exec rm {} \;
