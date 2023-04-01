@@ -15,6 +15,8 @@
 #
 ################################################################################
 
+make clean distclean || echo "no need to clean"
+
 # build oniguruma and link statically
 pushd oniguruma
 make clean distclean || echo "no need to clean"
@@ -23,14 +25,19 @@ autoreconf -vfi
 make -j$(nproc)
 popd
 export ONIG_CFLAGS="-I$PWD/oniguruma/src"
-export ONIG_LIBS="-L$PWD/oniguruma/src/.libs -l:libonig.a"
+export ONIG_LIBS="$PWD/oniguruma/src/.libs/libonig.a"
+
+if [ ! -f $ONIG_LIBS ]; then
+    echo "ONIG LIBS not exists"
+    exit 1
+fi
 
 # PHP's zend_function union is incompatible with the object-size sanitizer
 export CFLAGS="$CFLAGS -fno-sanitize=object-size"
 export CXXFLAGS="$CXXFLAGS -fno-sanitize=object-size"
+export LIBS="$LIBS $ONIG_LIBS"
 
 # build project
-make clean distclean || echo "no need to clean"
 ./buildconf
 ./configure \
     --disable-all \
