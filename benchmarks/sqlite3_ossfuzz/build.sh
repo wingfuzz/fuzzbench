@@ -29,7 +29,8 @@ export CFLAGS="$CFLAGS -DSQLITE_MAX_LENGTH=128000000 \
                -DSQLITE_PRINTF_PRECISION_LIMIT=1048576 \
                -DSQLITE_DEBUG=1 \
                -DSQLITE_MAX_PAGE_COUNT=16384"             
-               
+
+make clean distclean || echo "no need to clean"           
 ../configure
 make -j$(nproc)
 make sqlite3.c
@@ -43,7 +44,13 @@ $CXX $CXXFLAGS \
 
 cp $SRC/*.dict $SRC/*.zip $OUT/
 
-cd /out
-rm -rf /out/seeds
-unzip ossfuzz_seed_corpus.zip -d ./seeds
-find /out/seeds/ -size +999k -exec rm {} \;
+
+rm -rf $OUT/seeds
+mkdir -p $OUT/seeds
+
+rm -rf $OUT/ossfuzz_seed_corpus
+mkdir -p  $OUT/ossfuzz_seed_corpus
+
+unzip ossfuzz_seed_corpus.zip -d $OUT/ossfuzz_seed_corpus
+find $OUT/ossfuzz_seed_corpus -type f -exec cp {} $OUT/seeds \;
+find $OUT/seeds -size +999k -exec rm {} \;
