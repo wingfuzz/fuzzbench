@@ -7,21 +7,22 @@ import time
 from typing import List 
 
 
-def run_docker(fuzzers:List[str], fuzz_targets:List[str], rebuild:str, cpus:float, memory:str, stop_timeout:int) -> None:
-    """ 运行 docker 构建镜像，运行镜像
+def run_docker_build(fuzzers:List[str], fuzz_targets:List[str], rebuild:str) -> None:
+    
+    if not os.path.exists(SHARED_DIR):
+        os.mkdir(SHARED_DIR)
 
-    Args:
-        fuzzers (List[str]): 模糊测试器的列表
-        fuzz_targets (List[str]): 被测项目的列表
-        rebuild (str): 是否重新构建镜像
-        cpus (float): 容器所需的cpu数目
-        memory (str): 容器所需的内存
-        stop_timeout (int): 容器运行的时间, 单位 秒
+    run_images = {}
+    for fuzzer in fuzzers:
+        for target in fuzz_targets:
+            container_name = f"{fuzzer}_{target}"
+            image_name = os.path.join(DOCKER_IMAGE_BASE_TAG, container_name)
+            run_images[container_name] = image_name
+    
+    build_fuzz_images(fuzzers, fuzz_targets, rebuild)
 
-    Returns:
-        None : 中间步骤出错则退出 
-    """
 
+def run_docker_fuzz(fuzzers:List[str], fuzz_targets:List[str], cpus:float, memory:str) -> None:
     if not os.path.exists(SHARED_DIR):
         os.mkdir(SHARED_DIR)
 
@@ -32,29 +33,25 @@ def run_docker(fuzzers:List[str], fuzz_targets:List[str], rebuild:str, cpus:floa
             image_name = os.path.join(DOCKER_IMAGE_BASE_TAG, container_name)
             run_images[container_name] = image_name
 
-    build_fuzz_images(fuzzers, fuzz_targets, rebuild)
+    for c in run_images.keys():
+        container_name = c 
+        image_name = run_images[c]
+        if "coverage" in container_name:
+            pass 
+        else:
+            if check_image_exist(image_name):
+                code, _ = popen(f"docker run -d --name {container_name} --cpus {cpus} --memory {memory} --volume $PWD/output:{SHARED_DIR} {image_name} /bin/sh /run_fuzz.sh")
+                if code != 0:
+                    exit(code)
+            else:
+                print(f"Can find image {image_name}")
 
-    # for c in run_images.keys():
-    #     container_name = c 
-    #     image_name = run_images[c]
-    #     if "coverage" in container_name:
-    #         pass 
-    #     else:
-    #         if check_image_exist(image_name):
-    #             code, _ = popen(f"docker run -d --name {container_name} --cpus {cpus} --memory {memory} --volume $PWD/output:{SHARED_DIR} {image_name} /bin/sh /run_fuzz.sh")
-    #             if code != 0:
-    #                 exit(code)
-    #         else:
-    #             print(f"Can find image {image_name}")
-
-    # if "coverage" in fuzzers:
-    #     for t in fuzz_targets:
-    #         image_name = os.path.join(DOCKER_IMAGE_BASE_TAG, f"coverage_{t}")
-    #         if check_image_exist(image_name):
-    #             code, _ = popen(f"docker run -d --name coverage_{t} --cpus {cpus} --memory {memory} --volume $PWD/output:{SHARED_DIR} {image_name} /bin/sh /run_monitor.sh")
-    #             if code != 0:
-    #                 exit(code)
-    #         else:
-    #             print(f"Can find image {image_name}")
-        
-
+    if "coverage" in fuzzers:
+        for t in fuzz_targets:
+            image_name = os.path.join(DOCKER_IMAGE_BASE_TAG, f"coverage_{t}")
+            if check_image_exist(image_name):
+                code, _ = popen(f"docker run -d --name coverage_{t} --cpus {cpus} --memory {memory} --volume $PWD/output:{SHARED_DIR} {image_name} /bin/sh /run_monitor.sh")
+                if code != 0:
+                    exit(code)
+            else:
+                print(f"Can find image {image_name}")
