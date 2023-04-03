@@ -40,7 +40,7 @@ def run_docker_fuzz(fuzzers:List[str], fuzz_targets:List[str], cpus:float, memor
             pass 
         else:
             if check_image_exist(image_name):
-                code, _ = popen(f"docker run -d --name {container_name} --cpus {cpus} --memory {memory} --volume $PWD/output:{SHARED_DIR} {image_name} /bin/sh /run_fuzz.sh")
+                code, _ = popen(f"docker run -d --name {container_name} --cpus {cpus} --memory {memory} --volume $PWD/output:{SHARED_DIR} {image_name} /bin/bash /run_fuzz.sh")
                 if code != 0:
                     exit(code)
             else:
