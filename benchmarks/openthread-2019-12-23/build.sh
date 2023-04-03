@@ -15,6 +15,7 @@
 
 cd openthread
 git checkout 5b0af03afb8e70e8216f69623bd18bcd3d4b8b43
+make clean distclean || echo "no need to clean"
 ./bootstrap
 export CPPFLAGS="                                     \
     -DOPENTHREAD_CONFIG_BORDER_AGENT_ENABLE=1         \
@@ -58,6 +59,6 @@ fi
 make V=1 -j $(nproc) CXXFLAGS+=-Wno-conversion
 
 cp tests/fuzz/ip6-send-fuzzer $OUT/fuzz-target
-cd /out 
+cd $OUT
 mkdir -p seeds
 echo 1 > seeds/1
