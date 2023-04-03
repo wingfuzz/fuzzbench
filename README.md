@@ -1,5 +1,24 @@
 # OpenSourceFuzzBench
-## 测试对象：AFL、AFL++、Libfuzzer、Honggfuzz、eclipser
+## 构建镜像
+```
+python3 build.py -f <FUZZERS ...>-t <TARGETS ...>
+```
+
+FUZZERS是要构建的模糊测试器列表，有以下的选项：
+`afl`, `aflplusplus`, `libfuzzer`, `honggfuzz`, `eclipser`, `coverage`
+
+TARGETS是要构建的项目列表，可以从下面的测试项目中选择。
+
+FUZZERS 和 TARGETS 都可以是多个，构建的时候会进行排列组合，例如，选择了2个fuzzers，5个targets，则一共会构建10个镜像。（除此之外，还有一个基础镜像，每个fuzzer一个模糊测试器镜像）
+
+构建出的镜像名称为：`dev.shuimuyulin.com/fuzzbench/{fuzzer}_{target}`，例如`dev.shuimuyulin.com/fuzzbench/afl_freetype2-2017`。
+
+## 运行测试
+```
+python3 fuzz.py -f <FUZZERS ...>-t <TARGETS ...>
+```
+启动列表中的测试，FUZZERS和TARGET和构建中的参数相同。注意，如果要收集覆盖率，则FUZZERS中必须包含`coverage`。启动的时候会在当前目录下创建output目录，其中包含了每个模糊测试器的输出结果。
+
 ## 测试项目
 |项目|测试目标|字典|初始种子
 |-|-|-|-|
