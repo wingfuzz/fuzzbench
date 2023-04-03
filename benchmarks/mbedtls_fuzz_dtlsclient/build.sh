@@ -21,6 +21,7 @@ pip3 install -r /mbedtls/scripts/basic.requirements.txt
 
 # build project
 perl scripts/config.pl set MBEDTLS_PLATFORM_TIME_ALT
+rm -rf build
 mkdir -p build
 cd build
 cmake -DENABLE_TESTING=OFF ..
@@ -48,6 +49,6 @@ cd fuzz
 # export other associated stuff
 cp *.options $OUT/
 cp fuzz_*_seed_corpus.zip $OUT/
-rm -rf /out/seeds
-mkdir /out/seeds
-unzip /out/fuzz_dtlsclient_seed_corpus.zip -d /out/seeds
+rm -rf $OUT/seeds
+mkdir $OUT/seeds
+unzip $OUT/fuzz_dtlsclient_seed_corpus.zip -d $OUT/seeds
