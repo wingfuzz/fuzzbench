@@ -26,7 +26,7 @@ def main():
         return 1
     
     compression_work_dir_code()
-    run_docker_build(True, args.fuzzers, args.fuzz_targets, args.rebuild)    
+    run_docker_build(args.fuzzers, args.fuzz_targets, args.rebuild)    
 
 if __name__ == "__main__":
     main()
