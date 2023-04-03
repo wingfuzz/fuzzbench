@@ -51,6 +51,6 @@ mkdir -p $OUT/seeds
 rm -rf $OUT/ossfuzz_seed_corpus
 mkdir -p  $OUT/ossfuzz_seed_corpus
 
-unzip ossfuzz_seed_corpus.zip -d $OUT/ossfuzz_seed_corpus
+unzip $OUT/ossfuzz_seed_corpus.zip -d $OUT/ossfuzz_seed_corpus
 find $OUT/ossfuzz_seed_corpus -type f -exec cp {} $OUT/seeds \;
 find $OUT/seeds -size +999k -exec rm {} \;
