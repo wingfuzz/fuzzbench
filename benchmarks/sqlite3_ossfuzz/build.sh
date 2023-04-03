@@ -46,3 +46,4 @@ cp $SRC/*.dict $SRC/*.zip $OUT/
 cd /out
 rm -rf /out/seeds
 unzip ossfuzz_seed_corpus.zip -d ./seeds
+find /out/seeds/ -size +999k -exec rm {} \;

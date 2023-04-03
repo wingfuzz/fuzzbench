@@ -9,3 +9,4 @@ PYTHONPATH=$WORK/fuzzbench python3 -u -c "from fuzzers import utils; utils.initi
 cd /out 
 rm -rf ./seeds
 unzip fuzz-link-parser_seed_corpus.zip -d ./seeds
+find /out/seeds/ -size +999k -exec rm {} \;
