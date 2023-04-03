@@ -32,29 +32,29 @@ def run_docker(fuzzers:List[str], fuzz_targets:List[str], rebuild:str, cpus:floa
             image_name = os.path.join(DOCKER_IMAGE_BASE_TAG, container_name)
             run_images[container_name] = image_name
 
-    # build_fuzz_images(fuzzers, fuzz_targets, rebuild)
+    build_fuzz_images(fuzzers, fuzz_targets, rebuild)
 
-    for c in run_images.keys():
-        container_name = c 
-        image_name = run_images[c]
-        if "coverage" in container_name:
-            pass 
-        else:
-            if check_image_exist(image_name):
-                code, _ = popen(f"docker run -d --name {container_name} --cpus {cpus} --memory {memory} --volume $PWD/output:{SHARED_DIR} {image_name} /bin/sh /run_fuzz.sh")
-                if code != 0:
-                    exit(code)
-            else:
-                print(f"Can find image {image_name}")
+    # for c in run_images.keys():
+    #     container_name = c 
+    #     image_name = run_images[c]
+    #     if "coverage" in container_name:
+    #         pass 
+    #     else:
+    #         if check_image_exist(image_name):
+    #             code, _ = popen(f"docker run -d --name {container_name} --cpus {cpus} --memory {memory} --volume $PWD/output:{SHARED_DIR} {image_name} /bin/sh /run_fuzz.sh")
+    #             if code != 0:
+    #                 exit(code)
+    #         else:
+    #             print(f"Can find image {image_name}")
 
-    if "coverage" in fuzzers:
-        for t in fuzz_targets:
-            image_name = os.path.join(DOCKER_IMAGE_BASE_TAG, f"coverage_{t}")
-            if check_image_exist(image_name):
-                code, _ = popen(f"docker run -d --name coverage_{t} --cpus {cpus} --memory {memory} --volume $PWD/output:{SHARED_DIR} {image_name} /bin/sh /run_monitor.sh")
-                if code != 0:
-                    exit(code)
-            else:
-                print(f"Can find image {image_name}")
+    # if "coverage" in fuzzers:
+    #     for t in fuzz_targets:
+    #         image_name = os.path.join(DOCKER_IMAGE_BASE_TAG, f"coverage_{t}")
+    #         if check_image_exist(image_name):
+    #             code, _ = popen(f"docker run -d --name coverage_{t} --cpus {cpus} --memory {memory} --volume $PWD/output:{SHARED_DIR} {image_name} /bin/sh /run_monitor.sh")
+    #             if code != 0:
+    #                 exit(code)
+    #         else:
+    #             print(f"Can find image {image_name}")
         
 
