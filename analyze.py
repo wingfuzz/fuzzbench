@@ -88,7 +88,7 @@ def weighted(values):
     """
     weights = []
     for i in range(len(values)):
-        w = 0.5 ** (i / 360) 
+        w = 0.5 ** (i * 10 / 360) 
         weights.append(w)
     return weights
 
