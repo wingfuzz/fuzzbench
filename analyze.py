@@ -3,11 +3,11 @@ import pyecharts.options as opts
 from pyecharts.charts import Line
 from pyecharts.charts import Bar
 import os 
-from config import SHARED_DIR
 from typing import Dict, List
+import sys 
 
 half_period = 360  #半衰期
-point = 30
+point = 144
 
 output = "./analyze_output"
 
@@ -21,8 +21,11 @@ def project_fuzzer_score(datas: Dict[str, Dict[str, float]]) -> None:
 
     # 确定有多少项目和多少fuzzer 
     projects = list(datas.keys())
-    fuzzers = datas[projects[0]].keys()
-    bar = Bar(init_opts=opts.InitOpts(width="1200px", height="876px", bg_color="white", page_title="开源FUZZ性能对比", is_horizontal_center=True))
+    fuzzers = []
+    for p in datas.keys():
+        fuzzers.extend(list(datas[p].keys()))
+    fuzzers = set(fuzzers)
+    bar = Bar(init_opts=opts.InitOpts(width="2000px", height="1400px", bg_color="white", page_title="开源FUZZ性能对比", is_horizontal_center=True))
     # x轴数据
     bar.add_xaxis(projects)
 
@@ -30,12 +33,16 @@ def project_fuzzer_score(datas: Dict[str, Dict[str, float]]) -> None:
         values = []
         for t in projects:
             try:
-                values.append(opts.BarItem(name=f, value=datas[t][f]))
+                print(f"{t}, {f}", datas[t][f])
+                if datas[t][f] > 0.25:
+                    values.append(opts.BarItem(name=f, value=datas[t][f], label_opts=opts.LabelOpts(formatter="{b} {c}")))
+                else:
+                    values.append(opts.BarItem(name=f, value=datas[t][f], label_opts=opts.LabelOpts(formatter="{b} {c}", position="right")))
             except KeyError as e:
+                values.append(opts.BarItem(name=f, value=0, label_opts=opts.LabelOpts(formatter="{b} {c}", position="right")))
                 print(f"{e} not exits")
-        sorted_values = sorted(values, key=lambda x: x.opts['value'], reverse=True)
-        bar.add_yaxis(f, sorted_values, label_opts=opts.LabelOpts(formatter="{b} - {c}"))
-
+        #sorted_values = sorted(values, key=lambda x: x.opts['value'], reverse=True)
+        bar.add_yaxis(f, values)
     # 将x轴和y轴交换
     bar.reversal_axis()
 
@@ -146,7 +153,6 @@ def read_coverage(cov_path):
 def read_crashe(crashe_path):
     df = pd.read_csv(crashe_path, header=None, encoding="utf-8")
     new_df = pd.DataFrame({"fuzzer": df[1], "crashes": df[3]}, columns=["fuzzer", "crashes"])
-    new_df = new_df[:point]
     new_dict = dict()
     for k in list(set(new_df["fuzzer"])):
         data = new_df.loc[new_df["fuzzer"] == k]
@@ -210,14 +216,15 @@ def report(project, cov_values, crashe_values):
     return scores
 
 
-def main():
+def run(output_dir:str) -> None:
     if not os.path.exists(output):
         os.mkdir(output)
 
-    coverage_dir =  os.path.join(SHARED_DIR, "coverage")
+    coverage_dir =  output_dir #os.path.join(output)
     project_number = 0
     sum_score_dict = {}
     score_dict = {}
+    fuzzer_count = {}
     for i in os.listdir(coverage_dir):
         project_number += 1
         project_dir = os.path.join(coverage_dir, i)
@@ -232,25 +239,48 @@ def main():
         for key, value in score.items():
             try:
                 sum_score_dict[key] += value 
+                fuzzer_count[key] += 1
             except KeyError:
                 sum_score_dict[key] = value 
+                fuzzer_count[key] = 1
 
     project_fuzzer_score(score_dict)
 
     # 最后的汇总
     file = open("./analyze_output/report.txt", mode="a+", encoding="utf-8")
-    sorted_values = sorted(sum_score_dict.items(), key=lambda x: x[1], reverse=True)
+    
     file.write("\n")
     file.write("--------------------------------------------\n")
     file.write("--------------FUZZER分数排名-----------------\n")
     file.write("--------------------------------------------\n")
     sorted_scores = {}
-    for k, v in sorted_values:
-        score = v / project_number * 100
+    for k, v in sum_score_dict.items():
+        score = v / fuzzer_count[k] * 100
         sorted_scores[k] = score
+    sorted_values = sorted(sorted_scores.items(), key=lambda x: x[1], reverse=True)
+    for k, score in sorted_values:
         file.write(f"\tfuzzer: {k}, score: {score}\n")
     file.write("--------------------------------------------\n\n")
-    fuzzer_score(sorted_scores)
+    fuzzer_score(dict(sorted_values))
+
+
+def main():
+    args = sys.argv
+    if len(args) == 1:
+        print("Please input coverage directory.")
+        return 0
+    
+    if len(args) == 2:
+        coverage_path = args[1]
+        if not os.path.exists(coverage_path):
+            print("Input path not exists.")
+            return 0
+        else:
+            run(coverage_path)
+    else:
+        print("No extra parameters required.")
+        return 0
+    
 
     
 
