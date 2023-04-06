@@ -184,7 +184,7 @@ def report(project, cov_values, crashe_values):
     d = global_end(cov_values)
     sort_d = sorted(d.items(), key=lambda x: x[1], reverse=True)
     max_v = sort_d[0][1] or 1
-    for key, value in sort_d.items():
+    for key, value in d.items():
         file.write(f"\tfuzzer: {key}, global coverage: {value}\n")
         try:
             total_score_dict[key] += value / max_v * 100 * 0.5
