@@ -25,7 +25,7 @@ def project_fuzzer_score(datas: Dict[str, Dict[str, float]]) -> None:
     for p in datas.keys():
         fuzzers.extend(list(datas[p].keys()))
     fuzzers = set(fuzzers)
-    bar = Bar(init_opts=opts.InitOpts(width="2000px", height="1400px", bg_color="white", page_title="开源FUZZ性能对比", is_horizontal_center=True))
+    bar = Bar(init_opts=opts.InitOpts(width="1450px", height="1500px", bg_color="white", page_title="开源FUZZ性能对比", is_horizontal_center=True))
     # x轴数据
     bar.add_xaxis(projects)
 
@@ -49,6 +49,7 @@ def project_fuzzer_score(datas: Dict[str, Dict[str, float]]) -> None:
     # 配置柱状图的样式
     bar.set_global_opts(
         title_opts=opts.TitleOpts(title=None, subtitle=None, pos_left="15%"),
+        toolbox_opts=opts.ToolboxOpts(is_show=True),
         xaxis_opts=opts.AxisOpts(name="分数"),
         yaxis_opts=opts.AxisOpts(name="项目"),
     )
