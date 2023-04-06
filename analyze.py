@@ -171,8 +171,10 @@ def total_scores(total_scores_datas):
         Dict[fuzzer, score] : 标准分
     """
     new_dict = {}
+    sort_d = sorted(total_scores_datas.items(), key=lambda x: x[1], reverse=True)
+    max_v = sort_d[0][1] or 1
     for k, v in total_scores_datas.items():
-        new_dict[k] = v / 2
+        new_dict[k] = v / max_v * 100
     return new_dict
 
 
@@ -226,7 +228,8 @@ def report(project, cov_values, crashe_values):
     file.write(f"\tnormal rate of stability: {stability}\n")
 
     scores = total_scores(total_score_dict)
-    for k, v in scores.items():
+    sort_d = sorted(scores.items(), key=lambda x: x[1], reverse=True)
+    for k, v in sort_d:
         file.write(f"\tfuzzer: {k}, score: {v}\n")
 
     file.write("--------------------------------------------\n\n")
@@ -273,7 +276,7 @@ def run(output_dir:str) -> None:
     file.write("--------------------------------------------\n")
     sorted_scores = {}
     for k, v in sum_score_dict.items():
-        score = v / fuzzer_count[k] * 100
+        score = v / fuzzer_count[k]
         sorted_scores[k] = score
     sorted_values = sorted(sorted_scores.items(), key=lambda x: x[1], reverse=True)
     for k, score in sorted_values:
