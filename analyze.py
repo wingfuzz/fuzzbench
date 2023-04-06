@@ -33,7 +33,6 @@ def project_fuzzer_score(datas: Dict[str, Dict[str, float]]) -> None:
         values = []
         for t in projects:
             try:
-                print(f"{t}, {f}", datas[t][f])
                 if datas[t][f] > 0.25:
                     values.append(opts.BarItem(name=f, value=datas[t][f], label_opts=opts.LabelOpts(formatter="{b} {c}")))
                 else:
@@ -163,11 +162,17 @@ def read_crashe(crashe_path):
 
 
 def total_scores(total_scores_datas):
-    global_cov_max_fuzzer = max(total_scores_datas, key=lambda k: total_scores_datas[k])
-    max_value = total_scores_datas[global_cov_max_fuzzer]
+    """ 计算出各个fuzzer在各项得分的总和 除以权重的和
+
+    Args:
+        total_scores_datas (Dict[fuzzer, score]): fuzzer 在当前项目的总分
+
+    Returns:
+        Dict[fuzzer, score] : 标准分
+    """
     new_dict = {}
     for k, v in total_scores_datas.items():
-        new_dict[k] = v / max_value
+        new_dict[k] = v / 2
     return new_dict
 
 
@@ -177,34 +182,46 @@ def report(project, cov_values, crashe_values):
     file.write(p_name)
     total_score_dict = {}
     d = global_end(cov_values)
-    for key, value in d.items():
+    sort_d = sorted(d.items(), key=lambda x: x[1], reverse=True)
+    max_v = sort_d[0][1] or 1
+    for key, value in sort_d.items():
         file.write(f"\tfuzzer: {key}, global coverage: {value}\n")
         try:
-            total_score_dict[key] += value 
+            total_score_dict[key] += value / max_v * 100 * 0.5
         except KeyError:
-            total_score_dict[key] = value 
+            total_score_dict[key] = value / max_v * 100 * 0.5
 
     d = global_end(crashe_values)
+    sort_d = sorted(d.items(), key=lambda x: x[1], reverse=True)
+    max_v = sort_d[0][1] or 1
     for key, value in d.items():
         file.write(f"\tfuzzer: {key}, global detection rate: {value}\n")
         try:
-            total_score_dict[key] += value 
+            total_score_dict[key] += value / max_v * 100 * 0.5
         except KeyError:
-            total_score_dict[key] = value 
+            total_score_dict[key] = value / max_v * 100 * 0.5
+
     d = time_averaging(cov_values)
+    sort_d = sorted(d.items(), key=lambda x: x[1], reverse=True)
+    max_v = sort_d[0][1] or 1
     for key, value in d.items():
         file.write(f"\tfuzzer: {key}, time average coverage: {value}\n")
         try:
-            total_score_dict[key] += value 
+            total_score_dict[key] += value / max_v * 100 * 0.5
         except KeyError:
-            total_score_dict[key] = value 
+            total_score_dict[key] = value / max_v * 100 * 0.5
+
     d = time_averaging(crashe_values)
+    sort_d = sorted(d.items(), key=lambda x: x[1], reverse=True)
+    max_v = sort_d[0][1] or 1
     for key, value in d.items():
         file.write(f"\tfuzzer: {key}, time average detection rate: {value}\n")
         try:
-            total_score_dict[key] += value 
+            total_score_dict[key] += value / max_v * 100 * 0.5
         except KeyError:
-            total_score_dict[key] = value 
+            total_score_dict[key] = value / max_v * 100 * 0.5
+
+    
     stability = 1
     file.write(f"\tnormal rate of stability: {stability}\n")
 
