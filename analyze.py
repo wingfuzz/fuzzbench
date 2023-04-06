@@ -33,7 +33,7 @@ def project_fuzzer_score(datas: Dict[str, Dict[str, float]]) -> None:
         values = []
         for t in projects:
             try:
-                if datas[t][f] > 0.25:
+                if datas[t][f] > 25:
                     values.append(opts.BarItem(name=f, value=datas[t][f], label_opts=opts.LabelOpts(formatter="{b} {c}")))
                 else:
                     values.append(opts.BarItem(name=f, value=datas[t][f], label_opts=opts.LabelOpts(formatter="{b} {c}", position="right")))
