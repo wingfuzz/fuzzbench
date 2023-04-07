@@ -41,9 +41,9 @@ COPY run_build.sh $SRC/
 COPY benchmark.yaml /
 COPY run_fuzz.sh /
 COPY run_monitor.sh /
+COPY meson.build $SRC
 
 RUN chmod +x /run_fuzz.sh && chmod +x $SRC/run_build.sh 
 RUN $SRC/run_build.sh 
 RUN chmod +x /run_monitor.sh
 
-COPY meson.build /work/src
