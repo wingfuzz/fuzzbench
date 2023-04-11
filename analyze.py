@@ -11,6 +11,8 @@ point = 144
 
 output = "./analyze_output"
 
+stability_data = None
+
 
 def project_fuzzer_score(datas: Dict[str, Dict[str, float]]) -> None:
     """ 给 项目和fuzzer 的分数绘图
@@ -178,6 +180,35 @@ def total_scores(total_scores_datas):
     return new_dict
 
 
+def read_stability_data(filename:str):
+    """ 读取fuzzer稳定性数据
+
+    Args:
+        fn (str): filename
+    """
+    stability_data = pd.read_csv(filename, header=0, encoding="utf-8")
+
+
+def stability_scores(project_name:str, fuzzers:List[str]):
+    """ 计算稳定性分数,总分为1,每次退出减0.1
+
+    Args:
+        project_name (str): 项目名称
+        fuzzers (List[str]): fuzzzer 列表
+
+    Returns:
+        _type_: 稳定性分数
+    """
+    stability_scores_dict = {}
+    for f in fuzzers:
+        df = stability_data.loc[(stability_data["fuzzer"] == f) & (stability_data["project_name"] == project_name)]
+        if df.shape[0] == 0:
+            stability_scores_dict[f] = 1
+        else:
+            stability_scores_dict[f] = 1 - df["count"].iloc[0] / 10
+    return stability_scores_dict
+
+
 def report(project, cov_values, crashe_values):
     file = open("./analyze_output/report.txt", mode="a+", encoding="utf-8")
     p_name = f"Project: {project}\n"
@@ -223,9 +254,15 @@ def report(project, cov_values, crashe_values):
         except KeyError:
             total_score_dict[key] = value / max_v * 100 * 0.5
 
-    
-    stability = 1
-    file.write(f"\tnormal rate of stability: {stability}\n")
+    stability_score_dict = stability_scores(project, list(total_score_dict.keys()))
+    sort_d = sorted(stability_score_dict.items(), key=lambda x: x[1], reverse=True)
+    max_v = sort_d[0][1] or 1
+    for key, value in stability_score_dict.items():
+        try:
+            total_score_dict[key] += value / max_v * 100 
+        except KeyError:
+            total_score_dict[key] = value / max_v * 100 
+        file.write(f"\tfuzzer: {key}, normal rate of stability: {value}\n")
 
     scores = total_scores(total_score_dict)
     sort_d = sorted(scores.items(), key=lambda x: x[1], reverse=True)
@@ -237,9 +274,15 @@ def report(project, cov_values, crashe_values):
     return scores
 
 
-def run(output_dir:str) -> None:
+def run(output_dir:str, stablility_file:str) -> None:
+
+    if not os.path.exists(output_dir):
+        print(f"{output_dir} not exists!")
+        return None
     if not os.path.exists(output):
         os.mkdir(output)
+
+    read_stability_data(stablility_file)
 
     coverage_dir =  output_dir #os.path.join(output)
     project_number = 0
@@ -288,16 +331,21 @@ def run(output_dir:str) -> None:
 def main():
     args = sys.argv
     if len(args) == 1:
-        print("Please input coverage directory.")
+        print("Please input coverage directory and stabilitly file.")
         return 0
     
-    if len(args) == 2:
+    if len(args) == 3:
         coverage_path = args[1]
+        stability_file = args[2]
         if not os.path.exists(coverage_path):
-            print("Input path not exists.")
+            print("Input coverage path not exists.")
             return 0
-        else:
-            run(coverage_path)
+        
+        if not os.path.exists(stability_file):
+            print("Input stability file path not exists.")
+            return 0
+ 
+        run(coverage_path, stability_file)
     else:
         print("No extra parameters required.")
         return 0
