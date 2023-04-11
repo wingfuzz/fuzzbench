@@ -15,7 +15,11 @@ FUZZERS 和 TARGETS 都可以是多个，构建的时候会进行排列组合，
 
 ## 运行测试
 ```
-python3 fuzz.py -f <FUZZERS ...>-t <TARGETS ...>
+python3 test.py -f <FUZZERS ...>-t <TARGETS ...>
+```
+### 全部运行的例子
+```
+python3 test.py afl aflplusplus coverage eclipser honggfuzz libfuzzer -t bloaty_fuzz_target curl_curl_fuzzer_http freetype2-2017 harfbuzz-1.3.2 jsoncpp_jsoncpp_fuzzer lcms-2017-03-21 libjpeg-turbo-07-2017 libpcap_fuzz_both libpng-1.2.56 libxml2-v2.9.2 mbedtls_fuzz_dtlsclient openssl_x509 openthread-2019-12-23 php_php-fuzz-parser proj4-2017-08-14 re2-2014-12-09 sqlite3_ossfuzz systemd_fuzz-link-parser vorbis-2017-12-11 woff2-2016-05-06 zlib_zlib_uncompress_fuzzer
 ```
 启动列表中的测试，FUZZERS和TARGET和构建中的参数相同。注意，如果要收集覆盖率，则FUZZERS中必须包含`coverage`。启动的时候会在当前目录下创建output目录，其中包含了每个模糊测试器的输出结果。
 
