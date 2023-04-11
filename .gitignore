@@ -6,3 +6,4 @@ report.txt
 analyze_output/
 output*
 *.tar
+analyze_output*

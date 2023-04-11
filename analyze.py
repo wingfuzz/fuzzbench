@@ -186,6 +186,7 @@ def read_stability_data(filename:str):
     Args:
         fn (str): filename
     """
+    global stability_data
     stability_data = pd.read_csv(filename, header=0, encoding="utf-8")
 
 
