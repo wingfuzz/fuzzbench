@@ -9,12 +9,12 @@ import sys
 half_period = 360  #半衰期
 point = 144
 
-output = "./analyze_output"
+analyze_output = "./analyze_output"
 
 stability_data = None
 
 
-def project_fuzzer_score(datas: Dict[str, Dict[str, float]]) -> None:
+def project_fuzzer_score(datas: Dict[str, Dict[str, float]], page_title:str, filename:str) -> None:
     """ 给 项目和fuzzer 的分数绘图
 
     Args:
@@ -27,7 +27,7 @@ def project_fuzzer_score(datas: Dict[str, Dict[str, float]]) -> None:
     for p in datas.keys():
         fuzzers.extend(list(datas[p].keys()))
     fuzzers = set(fuzzers)
-    bar = Bar(init_opts=opts.InitOpts(width="1450px", height="1500px", bg_color="white", page_title="开源FUZZ性能对比", is_horizontal_center=True))
+    bar = Bar(init_opts=opts.InitOpts(width="1450px", height="1500px", bg_color="white", page_title=page_title, is_horizontal_center=True))
     # x轴数据
     bar.add_xaxis(projects)
 
@@ -54,8 +54,7 @@ def project_fuzzer_score(datas: Dict[str, Dict[str, float]]) -> None:
         xaxis_opts=opts.AxisOpts(name="分数"),
         yaxis_opts=opts.AxisOpts(name="项目"),
     )
-
-    bar.render('./analyze_output/每个项目各个Fuzzer的得分.html')
+    bar.render(os.path.join(analyze_output, f"{filename}.html"))
 
 
 def fuzzer_score(datas:Dict[str,float]) -> None:
@@ -162,9 +161,25 @@ def read_crashe(crashe_path):
 
     return new_dict
 
+def standard_scores(scores_datas):
+    """ 计算出各个fuzzer的标准分
+
+    Args:
+        total_scores_datas (Dict[fuzzer, score]): fuzzer 在当前项目的总分
+
+    Returns:
+        Dict[fuzzer, score] : 标准分
+    """
+    new_dict = {}
+    sort_d = sorted(scores_datas.items(), key=lambda x: x[1], reverse=True)
+    max_v = sort_d[0][1] or 1
+    for k, v in scores_datas.items():
+        new_dict[k] = v / max_v * 100
+    return new_dict
+
 
 def total_scores(total_scores_datas):
-    """ 计算出各个fuzzer在各项得分的总和 除以权重的和
+    """ 计算出各个fuzzer在各项得分的总和
 
     Args:
         total_scores_datas (Dict[fuzzer, score]): fuzzer 在当前项目的总分
@@ -204,88 +219,154 @@ def stability_scores(project_name:str, fuzzers:List[str]):
     for f in fuzzers:
         df = stability_data.loc[(stability_data["fuzzer"] == f) & (stability_data["project_name"] == project_name)]
         if df.shape[0] == 0:
-            stability_scores_dict[f] = 1
+            stability_scores_dict[f] = 100
         else:
-            stability_scores_dict[f] = 1 - df["count"].iloc[0] / 10
+            stability_scores_dict[f] = (1 - df["count"].iloc[0] / 10) * 100
     return stability_scores_dict
 
 
-def report(project, cov_values, crashe_values):
-    file = open("./analyze_output/report.txt", mode="a+", encoding="utf-8")
-    p_name = f"Project: {project}\n"
-    file.write(p_name)
-    total_score_dict = {}
-    d = global_end(cov_values)
-    sort_d = sorted(d.items(), key=lambda x: x[1], reverse=True)
-    max_v = sort_d[0][1] or 1
-    for key, value in d.items():
-        file.write(f"\tfuzzer: {key}, global coverage: {value}\n")
-        try:
-            total_score_dict[key] += value / max_v * 100 * 0.5
-        except KeyError:
-            total_score_dict[key] = value / max_v * 100 * 0.5
+class Report(object):
+    """ 统计准确性、性能、稳定性三项分数写入csv
+    """
+    def __init__(self, output_path):
+        if not os.path.exists(output_path):
+            print(f"Output path {output_path} not exists!")
+            return None
+        self.output_path = output_path
+        self.accuracy_score = pd.DataFrame(columns=["项目",	"aflplusplus", "afl", "honggfuzz", "eclipser", "libfuzzer"])
+        self.performance_score = pd.DataFrame(columns=["项目", "aflplusplus", "afl", "honggfuzz", "eclipser", "libfuzzer"])
+        self.stability_score = pd.DataFrame(columns=["项目", "aflplusplus", "afl", "honggfuzz", "eclipser", "libfuzzer"])
 
-    d = global_end(crashe_values)
-    sort_d = sorted(d.items(), key=lambda x: x[1], reverse=True)
-    max_v = sort_d[0][1] or 1
-    for key, value in d.items():
-        file.write(f"\tfuzzer: {key}, global detection rate: {value}\n")
-        try:
-            total_score_dict[key] += value / max_v * 100 * 0.5
-        except KeyError:
-            total_score_dict[key] = value / max_v * 100 * 0.5
+    def write_accuracy(self, accuracy_score_dict):
+        self.accuracy_score.loc[self.accuracy_score.shape[0]] = accuracy_score_dict
 
-    d = time_averaging(cov_values)
-    sort_d = sorted(d.items(), key=lambda x: x[1], reverse=True)
-    max_v = sort_d[0][1] or 1
-    for key, value in d.items():
-        file.write(f"\tfuzzer: {key}, time average coverage: {value}\n")
-        try:
-            total_score_dict[key] += value / max_v * 100 * 0.5
-        except KeyError:
-            total_score_dict[key] = value / max_v * 100 * 0.5
+    def write_performance(self, performance_score_dict):
+        self.performance_score.loc[self.performance_score.shape[0]] = performance_score_dict
+    
+    def write_stability(self, stability__score_dict):
+        self.stability_score.loc[self.stability_score.shape[0]] = stability__score_dict
 
-    d = time_averaging(crashe_values)
-    sort_d = sorted(d.items(), key=lambda x: x[1], reverse=True)
-    max_v = sort_d[0][1] or 1
-    for key, value in d.items():
-        file.write(f"\tfuzzer: {key}, time average detection rate: {value}\n")
-        try:
-            total_score_dict[key] += value / max_v * 100 * 0.5
-        except KeyError:
-            total_score_dict[key] = value / max_v * 100 * 0.5
+    def project_report(self, project, cov_values, crashe_values):
+        file = open("./analyze_output/report.txt", mode="a+", encoding="utf-8")
+        p_name = f"Project: {project}\n"
+        file.write(p_name)
+        total_score_dict = {}
 
-    stability_score_dict = stability_scores(project, list(total_score_dict.keys()))
-    sort_d = sorted(stability_score_dict.items(), key=lambda x: x[1], reverse=True)
-    max_v = sort_d[0][1] or 1
-    for key, value in stability_score_dict.items():
-        try:
-            total_score_dict[key] += value / max_v * 100 
-        except KeyError:
-            total_score_dict[key] = value / max_v * 100 
-        file.write(f"\tfuzzer: {key}, normal rate of stability: {value}\n")
+        accuracy_dict = {}
+        performance_dict = {}
+        d = global_end(cov_values)
+        sort_d = sorted(d.items(), key=lambda x: x[1], reverse=True)
+        max_v = sort_d[0][1] or 1
+        for key, value in d.items():
+            file.write(f"\tfuzzer: {key}, global coverage: {value}\n")
+            try:
+                accuracy_dict[key] += value / max_v * 100 * 0.5
+            except KeyError:
+                accuracy_dict[key] = value / max_v * 100 * 0.5
 
-    scores = total_scores(total_score_dict)
-    sort_d = sorted(scores.items(), key=lambda x: x[1], reverse=True)
-    for k, v in sort_d:
-        file.write(f"\tfuzzer: {k}, score: {v}\n")
+        d = global_end(crashe_values)
+        sort_d = sorted(d.items(), key=lambda x: x[1], reverse=True)
+        max_v = sort_d[0][1] or 1
+        for key, value in d.items():
+            file.write(f"\tfuzzer: {key}, global detection rate: {value}\n")
+            try:
+                accuracy_dict[key] += value / max_v * 100 * 0.5
+            except KeyError:
+                accuracy_dict[key] = value / max_v * 100 * 0.5
 
-    file.write("--------------------------------------------\n\n")
+        d = time_averaging(cov_values)
+        sort_d = sorted(d.items(), key=lambda x: x[1], reverse=True)
+        max_v = sort_d[0][1] or 1
+        for key, value in d.items():
+            file.write(f"\tfuzzer: {key}, time average coverage: {value}\n")
+            try:
+                performance_dict[key] += value / max_v * 100 * 0.5
+            except KeyError:
+                performance_dict[key] = value / max_v * 100 * 0.5
 
-    return scores
+        d = time_averaging(crashe_values)
+        sort_d = sorted(d.items(), key=lambda x: x[1], reverse=True)
+        max_v = sort_d[0][1] or 1
+        for key, value in d.items():
+            file.write(f"\tfuzzer: {key}, time average detection rate: {value}\n")
+            try:
+                performance_dict[key] += value / max_v * 100 * 0.5
+            except KeyError:
+                performance_dict[key] = value / max_v * 100 * 0.5
+
+        stability_score_dict = stability_scores(project, list(accuracy_dict.keys()))
+        sort_d = sorted(stability_score_dict.items(), key=lambda x: x[1], reverse=True)
+        stability_dict = {}
+        max_v = sort_d[0][1] or 1
+        for key, value in stability_score_dict.items():
+            try:
+                total_score_dict[key] += value / max_v * 100 
+                stability_dict[key] += value / max_v * 100 
+            except KeyError:
+                total_score_dict[key] = value / max_v * 100 
+                stability_dict[key] = value / max_v * 100 
+            file.write(f"\tfuzzer: {key}, normal rate of stability: {value}\n")
+
+        accuracy_dict = standard_scores(accuracy_dict)
+        for k in accuracy_dict.keys():
+            total_score_dict[k] += accuracy_dict[k]
+
+        performance_dict = standard_scores(performance_dict)
+        for k in performance_dict.keys():
+            total_score_dict[k] += performance_dict[k]
+        
+        accuracy_dict["项目"] = project
+        performance_dict["项目"] = project
+        stability_score_dict["项目"] = project
+        self.write_accuracy(accuracy_dict)
+        self.write_performance(performance_dict)
+        self.write_stability(stability_score_dict)
+
+        scores = total_scores(total_score_dict)
+        sort_d = sorted(scores.items(), key=lambda x: x[1], reverse=True)
+        for k, v in sort_d:
+            file.write(f"\tfuzzer: {k}, score: {v}\n")
+
+        file.write("--------------------------------------------\n\n")
+
+        return scores
+    
+    def df2dict(self, df):
+        result_dict = {}
+        for p in df["项目"]:
+            project_df = df.loc[df["项目"] == p]
+            ser_dict = project_df.iloc[0].to_dict()
+            del ser_dict["项目"]
+            result_dict[p] = ser_dict
+        return result_dict
+    
+    def draw_html(self, datas, page_title, filename):
+        project_fuzzer_score(datas, page_title, filename)
+
+    def write2disk(self):
+        self.accuracy_score.to_csv(os.path.join(self.output_path, "准确性分数.csv"), index=None, encoding="utf-8")
+        self.performance_score.to_csv(os.path.join(self.output_path, "性能分数.csv"), index=None, encoding="utf-8")
+        self.stability_score.to_csv(os.path.join(self.output_path, "稳定性分数.csv"), index=None, encoding="utf-8")
+        self.draw_html(self.df2dict(self.accuracy_score), "准确性分数", "准确性分数")
+        self.draw_html(self.df2dict(self.performance_score), "性能分数", "性能分数")
+        self.draw_html(self.df2dict(self.stability_score), "稳定性分数", "稳定性分数")
 
 
-def run(output_dir:str, stablility_file:str) -> None:
+def run(coverage_dir:str, stablility_file:str) -> None:
 
-    if not os.path.exists(output_dir):
-        print(f"{output_dir} not exists!")
+    if not os.path.exists(coverage_dir):
+        print(f"{coverage_dir} not exists!")
         return None
-    if not os.path.exists(output):
-        os.mkdir(output)
+    if not os.path.exists(analyze_output):
+        os.mkdir(analyze_output)
 
     read_stability_data(stablility_file)
 
-    coverage_dir =  output_dir #os.path.join(output)
+
+    print(analyze_output)
+    print(os.listdir(coverage_dir))
+
+    report = Report(analyze_output)
     project_number = 0
     sum_score_dict = {}
     score_dict = {}
@@ -299,7 +380,7 @@ def run(output_dir:str, stablility_file:str) -> None:
         crashe_file = os.path.join(project_dir, "crashe.txt")
         crashe_values = read_crashe(crashe_file)
         draw_line(crashe_values, i, "Crashes")
-        score = report(i, cov_values, crashe_values)
+        score = report.project_report(i, cov_values, crashe_values)
         score_dict[i] = score
         for key, value in score.items():
             try:
@@ -309,7 +390,7 @@ def run(output_dir:str, stablility_file:str) -> None:
                 sum_score_dict[key] = value 
                 fuzzer_count[key] = 1
 
-    project_fuzzer_score(score_dict)
+    project_fuzzer_score(score_dict, "开源FUZZ性能对比", "每个项目各个Fuzzer的得分")
 
     # 最后的汇总
     file = open("./analyze_output/report.txt", mode="a+", encoding="utf-8")
@@ -328,6 +409,8 @@ def run(output_dir:str, stablility_file:str) -> None:
     file.write("--------------------------------------------\n\n")
     fuzzer_score(dict(sorted_values))
 
+    report.write2disk()
+
 
 def main():
     args = sys.argv
@@ -338,6 +421,7 @@ def main():
     if len(args) == 3:
         coverage_path = args[1]
         stability_file = args[2]
+        print(args)
         if not os.path.exists(coverage_path):
             print("Input coverage path not exists.")
             return 0
