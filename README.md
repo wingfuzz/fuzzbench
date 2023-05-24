@@ -1,7 +1,7 @@
 # OpenSourceFuzzBench
 ## 构建镜像
 ```
-python3 build.py -f <FUZZERS ...>-t <TARGETS ...>
+python3 build.py -f <FUZZERS ...> -t <TARGETS ...>
 ```
 
 FUZZERS是要构建的模糊测试器列表，有以下的选项：
@@ -12,6 +12,10 @@ TARGETS是要构建的项目列表，可以从下面的测试项目中选择。
 FUZZERS 和 TARGETS 都可以是多个，构建的时候会进行排列组合，例如，选择了2个fuzzers，5个targets，则一共会构建10个镜像。（除此之外，还有一个基础镜像，每个fuzzer一个模糊测试器镜像）
 
 构建出的镜像名称为：`dev.shuimuyulin.com/fuzzbench/{fuzzer}_{target}`，例如`dev.shuimuyulin.com/fuzzbench/afl_freetype2-2017`。
+
+* 构建镜像过程需要用到Ubuntu和Pypi软件源，如果默认软件源安装速度过慢，可以在config.py中设置
+
+* 构建出的镜像前缀可以在config.py中设置
 
 ## 运行测试
 ```
