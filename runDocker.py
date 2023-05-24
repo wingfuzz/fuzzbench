@@ -16,7 +16,7 @@ def run_docker_build(fuzzers:List[str], fuzz_targets:List[str], rebuild:str) -> 
     for fuzzer in fuzzers:
         for target in fuzz_targets:
             container_name = f"{fuzzer}_{target}"
-            image_name = os.path.join(DOCKER_IMAGE_BASE_TAG, container_name)
+            image_name = DOCKER_IMAGE_PREFIX + container_name
             run_images[container_name] = image_name
     
     build_fuzz_images(fuzzers, fuzz_targets, rebuild)
@@ -30,7 +30,7 @@ def run_docker_fuzz(fuzzers:List[str], fuzz_targets:List[str], cpus:float, memor
     for fuzzer in fuzzers:
         for target in fuzz_targets:
             container_name = f"{fuzzer}_{target}"
-            image_name = os.path.join(DOCKER_IMAGE_BASE_TAG, container_name)
+            image_name = DOCKER_IMAGE_PREFIX + container_name
             run_images[container_name] = image_name
 
     for c in run_images.keys():
@@ -48,7 +48,7 @@ def run_docker_fuzz(fuzzers:List[str], fuzz_targets:List[str], cpus:float, memor
 
     if "coverage" in fuzzers:
         for t in fuzz_targets:
-            image_name = os.path.join(DOCKER_IMAGE_BASE_TAG, f"coverage_{t}")
+            image_name = DOCKER_IMAGE_PREFIX + f"coverage_{t}"
             if check_image_exist(image_name):
                 code, _ = popen(f"docker run -d --name coverage_{t} --cpus {cpus} --memory {memory} --volume $PWD/output:{SHARED_DIR} {image_name} /bin/sh /run_monitor.sh")
                 if code != 0:

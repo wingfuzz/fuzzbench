@@ -1,5 +1,7 @@
 
-FROM dev.shuimuyulin.com/fuzzbench/base-image
+ARG DOCKER_IMAGE_PREFIX=""
+
+FROM ${DOCKER_IMAGE_PREFIX}base-image
 
 ENV FUZZER_NAME="coverage"
 
@@ -17,7 +19,8 @@ RUN apt-get update && \
         ninja-build \
         gcc-$(gcc --version|head -n1|sed 's/\..*//'|sed 's/.* //')-plugin-dev \
         libstdc++-$(gcc --version|head -n1|sed 's/\..*//'|sed 's/.* //')-dev \
-        clang-12 llvm-12 lld-12 libc++-12-dev libc++abi-12-dev
+        clang-12 llvm-12 lld-12 libc++-12-dev libc++abi-12-dev &&\
+    apt-get clean
         
 # Download afl++.
 RUN git clone -b dev https://github.com/AFLplusplus/AFLplusplus /afl && \

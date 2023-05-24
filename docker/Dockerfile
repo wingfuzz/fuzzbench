@@ -14,6 +14,9 @@
 
 FROM ubuntu:20.04
 
+ARG UBUNTU_MIRROR="https://mirrors.aliyun.com/ubuntu/"
+ARG PYPI_MIRROR="https://mirrors.aliyun.com/pypi/simple"
+
 ENV DEBIAN_FRONTEND=noninteractive \
     ASAN_OPTIONS="abort_on_error=1:symbolize=0:handle_abort=1:handle_sigill=1" \
     UBSAN_OPTIONS="abort_on_error=1:print_stacktrace=1:report_error_type=1:symbolize=0" \
@@ -22,48 +25,52 @@ ENV DEBIAN_FRONTEND=noninteractive \
     OUT=/out \
     ROOT_DIR=/src
 
-RUN mv /etc/apt/sources.list /etc/apt/sources.list-back && echo \
-    "deb http://mirrors.dev.shuimuyulin.com/ubuntu/ focal main restricted universe multiverse\n\
-    deb http://mirrors.dev.shuimuyulin.com/ubuntu/ focal-security main restricted universe multiverse\n\
-    deb http://mirrors.dev.shuimuyulin.com/ubuntu/ focal-updates main restricted universe multiverse\n\
-    deb http://mirrors.dev.shuimuyulin.com/ubuntu/ focal-proposed main restricted universe multiverse\n\
-    #deb http://mirrors.dev.shuimuyulin.com/ubuntu/ focal-backports main restricted universe multiverse\n\
+RUN env && \
+    mv /etc/apt/sources.list /etc/apt/sources.list-back && echo \
+    "deb ${UBUNTU_MIRROR} focal main restricted universe multiverse\n\
+    deb ${UBUNTU_MIRROR} focal-security main restricted universe multiverse\n\
+    deb ${UBUNTU_MIRROR} focal-updates main restricted universe multiverse\n\
+    deb ${UBUNTU_MIRROR} focal-proposed main restricted universe multiverse\n\
+    deb-src ${UBUNTU_MIRROR} focal main restricted universe multiverse\n\
+    deb-src ${UBUNTU_MIRROR} focal-security main restricted universe multiverse\n\
+    deb-src ${UBUNTU_MIRROR} focal-updates main restricted universe multiverse\n\
+    deb-src ${UBUNTU_MIRROR} focal-proposed main restricted universe multiverse\n\
     " > /etc/apt/sources.list && \
     apt-get update && \
-    apt-get upgrade -y && \
     apt-get install -y \
-    python3 python3-pip \
-    gcc g++ clang llvm lld libc++-dev libc++abi-dev \
-    cmake make git \
-    ninja-build \
-    autoconf \
-    automake \
-    libtool \
-    build-essential \
-    rsync \
-    wget \
-    curl \
-    zlib1g-dev \
-    libncurses5-dev \
-    libgdbm-dev \
-    libnss3-dev \
-    libssl-dev \
-    libreadline-dev \
-    libffi-dev \
-    virtualenv \
-    libbz2-dev \
-    liblzma-dev \
-    libsqlite3-dev \
-    libz-dev \
-    zip \
-    unzip \
-    vim \
-    ragel \
-    pkg-config && \
-    pip config set global.index-url http://mirrors.dev.shuimuyulin.com/pypi/web/simple && \
-    pip config set install.trusted-host mirrors.dev.shuimuyulin.com && \
-    pip3 install --upgrade pip && \
+        apt-utils apt-transport-https ca-certificates \
+        python3 python3-pip \
+        gcc g++ clang llvm lld libc++-dev libc++abi-dev \
+        cmake make git \
+        ninja-build \
+        autoconf \
+        automake \
+        libtool \
+        build-essential \
+        rsync \
+        wget \
+        curl \
+        zlib1g-dev \
+        libncurses5-dev \
+        libgdbm-dev \
+        libnss3-dev \
+        libssl-dev \
+        libreadline-dev \
+        libffi-dev \
+        virtualenv \
+        libbz2-dev \
+        liblzma-dev \
+        libsqlite3-dev \
+        libz-dev \
+        zip \
+        unzip \
+        vim \
+        ragel \
+        pkg-config && \
     apt-get clean && \
+    pip config set global.index-url ${PYPI_MIRROR} && \
+    pip config set install.trusted-host `echo ${PYPI_MIRROR} | awk -F[/:] '{print $4}'` && \
+    pip3 install --upgrade pip && \
     mkdir -p $WORK && \
     mkdir -p $SRC && \
     mkdir -p $OUT && \
@@ -71,4 +78,3 @@ RUN mv /etc/apt/sources.list /etc/apt/sources.list-back && echo \
 
 COPY fuzzbench.tar.gz /work
 RUN tar -zxvf /work/fuzzbench.tar.gz -C /work/fuzzbench
-

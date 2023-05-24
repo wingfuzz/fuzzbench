@@ -12,17 +12,20 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-FROM dev.shuimuyulin.com/fuzzbench/base-image
+ARG DOCKER_IMAGE_PREFIX=""
+
+FROM ${DOCKER_IMAGE_PREFIX}base-image
 
 ENV FUZZER_NAME="honggfuzz"
 
 # honggfuzz requires libfd and libunwid.
 RUN apt-get update -y && \
     apt-get install -y \
-    libbfd-dev \
-    libunwind-dev \
-    libblocksruntime-dev \
-    liblzma-dev 
+        libbfd-dev \
+        libunwind-dev \
+        libblocksruntime-dev \
+        liblzma-dev &&\
+    apt-get clean
 
 # Download honggfuz version 2.3.1 + 0b4cd5b1c4cf26b7e022dc1deb931d9318c054cb
 # Set CFLAGS use honggfuzz's defaults except for -mnative which can build CPU

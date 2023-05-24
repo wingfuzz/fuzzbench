@@ -1,5 +1,7 @@
 
-FROM dev.shuimuyulin.com/fuzzbench/base-image
+ARG DOCKER_IMAGE_PREFIX=""
+
+FROM ${DOCKER_IMAGE_PREFIX}base-image
 
 ENV FUZZER_NAME="aflplusplus"
 

@@ -12,35 +12,16 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-FROM dev.shuimuyulin.com/fuzzbench/base-image
+ARG DOCKER_IMAGE_PREFIX=""
+
+FROM ${DOCKER_IMAGE_PREFIX}base-image
 
 ENV FUZZER_NAME="eclipser"
 
-RUN mv /etc/apt/sources.list /etc/apt/sources.list-back && echo \
-    "deb http://mirrors.dev.shuimuyulin.com/ubuntu/ focal main restricted universe multiverse\n\
-    deb http://mirrors.dev.shuimuyulin.com/ubuntu/ focal-security main restricted universe multiverse\n\
-    deb http://mirrors.dev.shuimuyulin.com/ubuntu/ focal-updates main restricted universe multiverse\n\
-    deb http://mirrors.dev.shuimuyulin.com/ubuntu/ focal-proposed main restricted universe multiverse\n\
-    #deb http://mirrors.dev.shuimuyulin.com/ubuntu/ focal-backports main restricted universe multiverse\n\
-    deb-src http://mirrors.dev.shuimuyulin.com/ubuntu/ focal main restricted universe multiverse\n\
-    deb-src http://mirrors.dev.shuimuyulin.com/ubuntu/ focal-security main restricted universe multiverse\n\
-    deb-src http://mirrors.dev.shuimuyulin.com/ubuntu/ focal-updates main restricted universe multiverse\n\
-    deb-src http://mirrors.dev.shuimuyulin.com/ubuntu/ focal-proposed main restricted universe multiverse\n\
-    #deb http://mirrors.dev.shuimuyulin.com/ubuntu/ focal-backports main restricted universe multiverse\n\
-    " > /etc/apt/sources.list 
-
-
-# Upgrade to avoid certs errors
-RUN apt-get update && apt-get upgrade -y && \
-    apt-get install -y apt-utils apt-transport-https ca-certificates
-
-
 # Install dotnet, qemu and other Eclipser deps.
-RUN sed -i -- 's/# deb-src/deb-src/g' /etc/apt/sources.list
 RUN apt-get update -y && \
     apt-get build-dep -y qemu && \
     apt-get install -y \
-        apt-transport-https \
         libtool \
         libtool-bin \
         wget \
@@ -49,7 +30,8 @@ RUN apt-get update -y && \
         bison \
         git \
         gdb \
-        python2
+        python2 &&\
+    apt-get clean
 
 # Use a copy of
 # https://packages.microsoft.com/config/ubuntu/16.04/packages-microsoft-prod.deb
@@ -58,7 +40,8 @@ RUN wget -q https://storage.googleapis.com/fuzzbench-files/packages-microsoft-pr
     dpkg -i packages-microsoft-prod.deb && \
     apt-get update -y && \
     apt-get install -y dotnet-sdk-2.1 dotnet-runtime-2.1 && \
-    rm packages-microsoft-prod.deb
+    rm packages-microsoft-prod.deb && \
+    apt-get clean
 
 # Build Eclipser.
 RUN git clone https://github.com/SoftSec-KAIST/Eclipser.git /Eclipser && \
@@ -77,9 +60,7 @@ RUN git clone https://github.com/google/AFL.git /afl && \
     AFL_NO_X86=1 make
 
 # Use afl_driver.cpp for AFL, and StandaloneFuzzTargetMain.c for Eclipser.
-RUN apt-get update && \
-    apt-get install wget -y && \
-    wget https://raw.githubusercontent.com/llvm/llvm-project/5feb80e748924606531ba28c97fe65145c65372e/compiler-rt/lib/fuzzer/afl/afl_driver.cpp -O /afl/afl_driver.cpp && \
+RUN wget https://raw.githubusercontent.com/llvm/llvm-project/5feb80e748924606531ba28c97fe65145c65372e/compiler-rt/lib/fuzzer/afl/afl_driver.cpp -O /afl/afl_driver.cpp && \
     clang -Wno-pointer-sign -c /afl/llvm_mode/afl-llvm-rt.o.c -I/afl && \
     clang++ -stdlib=libc++ -std=c++11 -O2 -c /afl/afl_driver.cpp && \
     ar r /libAFL.a *.o && \
